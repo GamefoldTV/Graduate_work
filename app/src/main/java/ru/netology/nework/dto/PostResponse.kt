@@ -18,13 +18,3 @@ data class PostResponse(
     val ownedByMe : Boolean = false,
     val users : Map<String, UserPreview>?,
 )
-
-data class UserList (
-
-    val user: List<UserPreview>
-)
-
-data class UserPreview(
-    val name : String,
-    val avatar : String? = null,
-)

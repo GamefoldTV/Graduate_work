@@ -8,6 +8,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import ru.netology.nework.api.*
 import ru.netology.nework.auth.AuthState
 import ru.netology.nework.dao.PostDao
+import ru.netology.nework.dao.UserDao
 import ru.netology.nework.dto.*
 import ru.netology.nework.entity.PostEntity
 import ru.netology.nework.entity.toDto
@@ -23,10 +24,11 @@ import javax.inject.Singleton
 
 @Singleton
 class PostRepositoryImpl @Inject constructor(
-    private val dao: PostDao,
+    private val postdao: PostDao,
+    private val userdao: UserDao,
     private val apiService: ApiService,
     ) : PostRepository {
-    override val data = dao.getAll()
+    override val data = postdao.getAll()
         .map(List<PostEntity>::toDto)
         .flowOn(Dispatchers.Default)
 
@@ -38,8 +40,7 @@ class PostRepositoryImpl @Inject constructor(
             }
             val bodyResponse =
                 response.body() ?: throw ApiError(response.code(), response.message())
-            val body = bodyResponse.map {
-                println(it.users)
+            val post = bodyResponse.map {
                 Post(
                     it.id,
                     it.authorId,
@@ -58,7 +59,22 @@ class PostRepositoryImpl @Inject constructor(
                     it.ownedByMe
                 )
             }
-            dao.insert(body.toEntity())
+            val users = bodyResponse.map {
+                it.users?.map {
+                    Users(
+                        it.key.toLong(),
+                        it.value.name,
+                        it.value.avatar
+                    )
+                }
+            }
+            println(users)
+            postdao.insert(post.toEntity())
+            users.map {
+                if (it != null) {
+                    userdao.insert(it.toEntity())
+                }
+            }
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -74,7 +90,7 @@ class PostRepositoryImpl @Inject constructor(
             }
 
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(PostEntity.fromDto(body))
+            postdao.insert(PostEntity.fromDto(body))
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -84,7 +100,7 @@ class PostRepositoryImpl @Inject constructor(
 
     override suspend fun removeById(id: Long) {
         try {
-            dao.removeById(id)
+            postdao.removeById(id)
             val response = apiService.removeById(id)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())

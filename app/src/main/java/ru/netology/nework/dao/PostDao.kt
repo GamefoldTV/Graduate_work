@@ -3,7 +3,6 @@ package ru.netology.nework.dao
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 import ru.netology.nework.entity.PostEntity
-import ru.netology.nework.enumeration.AttachmentType
 
 @Dao
 interface PostDao {

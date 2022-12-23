@@ -11,4 +11,6 @@ import ru.netology.nework.db.AppDb
 object DaoModule {
     @Provides
     fun providePostDao(db: AppDb): PostDao = db.postDao()
+    @Provides
+    fun provideUserDao(db: AppDb): UserDao = db.userDao()
 }
