@@ -39,11 +39,13 @@ class PostRepositoryImpl @Inject constructor(
             val bodyResponse =
                 response.body() ?: throw ApiError(response.code(), response.message())
             val body = bodyResponse.map {
+                println(it.users)
                 Post(
                     it.id,
                     it.authorId,
                     it.author,
                     it.authorAvatar,
+                    it.authorJob,
                     it.content,
                     it.published,
                     it.coords,

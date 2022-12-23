@@ -46,22 +46,10 @@ class FeedFragment : Fragment() {
 
             }
 
-            override fun onShare(post: Post) {
-                val intent = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    putExtra(Intent.EXTRA_TEXT, post.content)
-                    type = "text/plain"
-                }
-
-                val shareIntent =
-                    Intent.createChooser(intent, getString(R.string.chooser_share_post))
-                startActivity(shareIntent)
-            }
-
-            override fun onPreviewImage(post: Post) {
+           override fun onPreviewImage(post: Post) {
                 findNavController().navigate(R.id.action_feedFragment_to_imagePreviewFragment,
                     Bundle().apply {
-                   //     textArg = post.attachment?.url
+                        textArg = post.attachment?.url
                     })
             }
 

@@ -5,6 +5,7 @@ data class PostResponse(
     val authorId: Long,
     val author: String,
     val authorAvatar: String? = null,
+    val authorJob : String? = null,
     val content: String,
     val published: String,
     val coords : Coordinates? = null,
@@ -15,11 +16,12 @@ data class PostResponse(
     val likedByMe : Boolean = false,
     val attachment : Attachment? = null,
     val ownedByMe : Boolean = false,
-    val users : UserList?,
+    val users : Map<String, UserPreview>?,
 )
 
 data class UserList (
-    val user: ArrayList<UserPreview>
+
+    val user: List<UserPreview>
 )
 
 data class UserPreview(

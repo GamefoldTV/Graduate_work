@@ -16,6 +16,7 @@ data class PostEntity(
     val authorId: Long,
     val author: String,
     val authorAvatar: String? = null,
+    val authorJob : String? = null,
     val content: String,
     val published: String,
     @Embedded
@@ -37,6 +38,7 @@ data class PostEntity(
         authorId,
         author,
         authorAvatar,
+        authorJob,
         content,
         published,
         coords?.toDto(),
@@ -56,6 +58,7 @@ data class PostEntity(
                 dto.authorId,
                 dto.author,
                 dto.authorAvatar,
+                dto.authorJob,
                 dto.content,
                 dto.published,
                 CoordEmbeddable.fromDto(dto.coords),

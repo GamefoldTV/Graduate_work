@@ -5,6 +5,7 @@ data class Post(
     val authorId: Long,
     val author: String,
     val authorAvatar: String? = null,
+    val authorJob : String? = null,
     val content: String,
     val published: String,
     val coords : Coordinates? = null,

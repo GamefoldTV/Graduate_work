@@ -49,6 +49,13 @@ class PostViewHolder(
     fun bind(post: Post) {
         binding.apply {
             author.text = post.author
+
+            if (post.authorJob.isNullOrBlank()) {
+                authorJob.visibility = 8
+            } else {
+                authorJob.text = post.authorJob
+                authorJob.visibility = 0
+            }
             published.text = convertString2Date2String(post.published)
 
             content.text = post.content

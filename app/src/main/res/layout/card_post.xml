@@ -31,12 +31,27 @@
             android:layout_marginStart="@dimen/common_spacing"
             android:ellipsize="end"
             android:singleLine="true"
+            app:layout_constraintBottom_toTopOf="@+id/authorJob"
             app:layout_constraintEnd_toStartOf="@+id/menu"
             app:layout_constraintStart_toEndOf="@id/avatar"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/published"
             app:layout_constraintVertical_chainStyle="packed"
             tools:text="@sample/posts.json/data/author" />
+
+        <TextView
+            android:id="@+id/authorJob"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/common_spacing"
+            android:ellipsize="end"
+            android:visibility="gone"
+            android:singleLine="true"
+            app:layout_constraintBottom_toTopOf="@+id/published"
+            app:layout_constraintEnd_toStartOf="@+id/menu"
+            app:layout_constraintStart_toEndOf="@id/avatar"
+            app:layout_constraintTop_toBottomOf="@id/author"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="@sample/posts.json/data/authorJob" />
 
         <TextView
             android:id="@+id/published"
@@ -44,10 +59,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/common_spacing"
             android:layout_marginBottom="@dimen/common_spacing"
-            app:layout_constraintTop_toBottomOf="@id/author"
             app:layout_constraintBottom_toBottomOf="@id/header"
             app:layout_constraintEnd_toStartOf="@+id/menu"
             app:layout_constraintStart_toEndOf="@id/avatar"
+            app:layout_constraintTop_toBottomOf="@+id/authorJob"
             app:layout_constraintVertical_chainStyle="packed"
             tools:text="@sample/posts.json/data/published" />
 
