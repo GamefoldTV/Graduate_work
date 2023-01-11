@@ -30,7 +30,7 @@ class ImagePreviewFragment  : Fragment()  {
         fragmentBinding = binding
 
         val url = arguments?.textArg
-        binding.imageView.load("${BuildConfig.BASE_URL}/media/${url}")
+        if (url !=null) binding.imageView.load(url)
         binding.back.setOnClickListener {
             findNavController().navigateUp()
         }

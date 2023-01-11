@@ -14,6 +14,12 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        Properties properties = new Properties()
+        if (rootProject.file("maps.properties").exists()){
+            properties.load(rootProject.file("maps.properties").newDataInputStream())
+        }
+        buildConfigField "String", "API_KEY", '"'+properties.getProperty("MAPS_API_KEY")+'"'
     }
 
     compileOptions {
@@ -101,7 +107,7 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-
+    implementation "com.yandex.android:maps.mobile:4.1.0-full"
     testImplementation "junit:junit:$junit_version"
     androidTestImplementation "androidx.test.ext:junit:$ext_junit_version"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_core_version"

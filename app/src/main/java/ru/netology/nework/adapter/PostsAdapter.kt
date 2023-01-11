@@ -1,15 +1,19 @@
 package ru.netology.nework.adapter
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.MediaController
 import android.widget.PopupMenu
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.netology.nework.R
 import ru.netology.nework.databinding.CardPostBinding
 import ru.netology.nework.dto.Post
+import ru.netology.nework.enumeration.AttachmentType
 import ru.netology.nework.view.load
 import ru.netology.nework.view.loadCircleCrop
 
@@ -17,8 +21,8 @@ interface OnInteractionListener {
     fun onLike(post: Post) {}
     fun onEdit(post: Post) {}
     fun onRemove(post: Post) {}
-    fun onShare(post: Post) {}
-    fun onPreviewImage(post : Post){}
+    fun onPreviewImage(post: Post) {}
+    fun onPreviewMap(post: Post) {}
 }
 
 class PostsAdapter(
@@ -66,10 +70,55 @@ class PostViewHolder(
                 avatar.loadCircleCrop(post.authorAvatar)
             else avatar.setImageResource(R.mipmap.ic_avatar_1_round)
 
-            like.isChecked = post.likedByMe
+            buttonLike.isChecked = post.likedByMe
 
-            if (post.attachment?.url != null) AttachmentImage.load(post.attachment.url)
+            buttonMap.isVisible = post.coords != null
 
+            when (post.attachment?.type) {
+                AttachmentType.IMAGE -> {
+                    AttachmentFrame.visibility = 0
+                    AttachmentImage.visibility = 0
+                    AttachmentVideo.visibility = 8
+                    AttachmentImage.load(post.attachment.url)
+                }
+                AttachmentType.VIDEO -> {
+                    AttachmentFrame.visibility = 0
+                    AttachmentImage.visibility = 8
+                    AttachmentVideo.apply {
+                        visibility = 0
+                        setMediaController(MediaController(binding.root.context))
+                        setVideoURI(Uri.parse(post.attachment.url))
+                        setOnPreparedListener {
+                            animate().alpha(1F)
+                            seekTo(0)
+                            setZOrderOnTop(false)
+                        }
+                        setOnCompletionListener {
+                            stopPlayback()
+                        }
+                    }
+
+                }
+                AttachmentType.AUDIO -> {
+                    AttachmentFrame.visibility = 0
+                    AttachmentImage.visibility = 8
+                    AttachmentVideo.apply {
+                        visibility = 0
+                        setMediaController(MediaController(binding.root.context))
+                        setVideoURI(Uri.parse(post.attachment.url))
+                        setBackgroundResource(R.drawable.audio2)
+                        setOnPreparedListener {
+                            setZOrderOnTop(true)
+                        }
+                        setOnCompletionListener {
+                            stopPlayback()
+                        }
+                    }
+                }
+                null -> {
+                    AttachmentFrame.visibility = 8
+                }
+            }
 
             menu.visibility = if (post.ownedByMe) View.VISIBLE else View.INVISIBLE
 
@@ -94,13 +143,13 @@ class PostViewHolder(
                 }.show()
             }
 
-            like.setOnClickListener {
+            buttonLike.setOnClickListener {
                 onInteractionListener.onLike(post)
             }
-
-            AttachmentImage.setOnClickListener {
-                onInteractionListener.onPreviewImage(post)
+            buttonMap.setOnClickListener {
+                onInteractionListener.onPreviewMap(post)
             }
+
         }
     }
 }

@@ -1,6 +1,5 @@
 package ru.netology.nework.activity
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +15,8 @@ import ru.netology.nework.adapter.OnInteractionListener
 import ru.netology.nework.adapter.PostsAdapter
 import ru.netology.nework.databinding.FragmentFeedBinding
 import ru.netology.nework.dto.Post
+import ru.netology.nework.util.CompanionArg.Companion.doubleArg1
+import ru.netology.nework.util.CompanionArg.Companion.doubleArg2
 import ru.netology.nework.util.CompanionArg.Companion.textArg
 import ru.netology.nework.viewmodel.PostViewModel
 
@@ -46,13 +47,23 @@ class FeedFragment : Fragment() {
 
             }
 
-           override fun onPreviewImage(post: Post) {
+            override fun onPreviewMap(post: Post) {
+                if (post.coords != null)
+                    findNavController().navigate(R.id.action_feedFragment_to_mapsFragment,
+                        Bundle().apply {
+                            doubleArg1 = post.coords.lat.toDouble()
+                            doubleArg2 = post.coords.long.toDouble()
+                        })
+
+            }
+
+            override fun onPreviewImage(post: Post) {
                 findNavController().navigate(R.id.action_feedFragment_to_imagePreviewFragment,
                     Bundle().apply {
                         textArg = post.attachment?.url
                     })
-            }
 
+            }
         })
         binding.list.adapter = adapter
         viewModel.dataState.observe(viewLifecycleOwner) { state ->
@@ -73,7 +84,6 @@ class FeedFragment : Fragment() {
         binding.swiperefresh.setOnRefreshListener {
             viewModel.refreshPosts()
         }
-
 
         binding.fab.setOnClickListener {
             findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)

@@ -118,18 +118,37 @@ class PostRepositoryImpl @Inject constructor(
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
-            val post = response.body() ?: throw ApiError(response.code(), response.message())
+            val post =
+                response.body()?.let {
+                    Post(
+                        it.id,
+                        it.authorId,
+                        it.author,
+                        it.authorAvatar,
+                        it.authorJob,
+                        it.content,
+                        it.published,
+                        it.coords,
+                        it.link,
+                        it.likeOwnerIds,
+                        it.mentionIds,
+                        it.mentionedMe,
+                        it.likedByMe,
+                        it.attachment,
+                        it.ownedByMe
+                        )
+                } ?: throw ApiError(response.code(), response.message())
 
             if (post.likedByMe) {
                 val dislikedPost = post.copy(likedByMe = false)//, likes = post.likes - 1)
-               // dao.insert(PostEntity.fromDto(dislikedPost))
+                postdao.insert(PostEntity.fromDto(dislikedPost))
                 val response = apiService.dislikeById(id)
                 if (!response.isSuccessful) {
                     throw ApiError(response.code(), response.message())
                 }
             } else {
                 val likedPost = post.copy(likedByMe = true)//, likes = post.likes + 1)
-                    //  dao.insert(PostEntity.fromDto(likedPost))
+                postdao.insert(PostEntity.fromDto(likedPost))
                 val response = apiService.likeById(id)
                 if (!response.isSuccessful) {
                     throw ApiError(response.code(), response.message())

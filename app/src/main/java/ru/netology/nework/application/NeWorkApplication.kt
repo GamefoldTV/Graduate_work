@@ -1,10 +1,12 @@
 package ru.netology.nework.application
 
 import android.app.Application
+import com.yandex.mapkit.MapKitFactory
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import ru.netology.nework.BuildConfig
 import ru.netology.nework.auth.AppAuth
 import javax.inject.Inject
 
@@ -17,6 +19,8 @@ class NeWorkApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        MapKitFactory.setApiKey("${BuildConfig.API_KEY}")
+        MapKitFactory.initialize(this);
         setupAuth()
     }
 
