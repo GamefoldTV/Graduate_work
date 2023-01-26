@@ -29,9 +29,16 @@
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>
     <string name="sign_out">Sign Out</string>
-    <string name="prompt_login">Login</string>
-    <string name="prompt_password">Password</string>
+    <string name="login_login">Login</string>
+    <string name="login_password">Password</string>
     <string name="action_sign_in">Sign in or register</string>
     <string name="guest_entrance">Guest entrance</string>
     <string name="welcome">"Welcome "</string>
+    <string name="new_post_content">Content:</string>
+    <string name="new_post_link">Link:</string>
+    <string name="new_post_coords">Location:</string>
+    <string name="login_register">Register</string>
+    <string name="login_name">Name</string>
+    <string name="latitude" translatable="false">latitude:</string>
+    <string name="longitude" translatable="false">longitude:</string>
 </resources>

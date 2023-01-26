@@ -7,4 +7,5 @@
     <color name="appbar_color">#FF000000</color>
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorCardSurface">#F4DCF8</color>
+    <color name="colorNull">#fafafa</color>
 </resources>

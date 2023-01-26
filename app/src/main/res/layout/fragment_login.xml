@@ -10,41 +10,50 @@
     android:paddingRight="@dimen/fragment_horizontal_margin"
     android:paddingBottom="@dimen/fragment_vertical_margin">
 
+    <CheckBox
+        android:id="@+id/checkBox_register"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="@dimen/marginLeft"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/login_register"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <EditText
         android:id="@+id/login"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginTop="96dp"
-        android:hint="@string/prompt_login"
+        android:hint="@string/login_login"
+        android:layout_marginLeft="@dimen/marginLeft"
+        android:layout_marginRight="@dimen/marginRight"
         android:inputType="text"
         android:selectAllOnFocus="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/checkBox_register"
+        />
 
     <EditText
         android:id="@+id/password"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:hint="@string/prompt_password"
+        android:layout_marginStart="@dimen/marginLeft"
+        android:layout_marginEnd="@dimen/marginRight"
+        android:hint="@string/login_password"
         android:inputType="textPassword"
         android:selectAllOnFocus="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/login" />
 
-
     <EditText
         android:id="@+id/name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:hint="Name"
+        android:layout_marginStart="@dimen/marginLeft"
+        android:layout_marginEnd="@dimen/marginRight"
+        android:hint="@string/login_name"
         android:visibility="invisible"
         android:inputType="textPersonName"
         android:selectAllOnFocus="true"
@@ -52,22 +61,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/password" />
 
+    <ImageView
+        android:id="@+id/avatarImage"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_gravity="fill_horizontal"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/name"
+        app:layout_constraintBottom_toTopOf="@id/button"
+        tools:srcCompat="@tools:sample/avatars" />
+
     <Button
         android:id="@+id/button"
-        android:layout_width="200dp"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
-        android:layout_marginStart="48dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="48dp"
-        android:layout_marginBottom="64dp"
+        android:layout_marginTop="@dimen/marginTop"
+        android:layout_marginStart="@dimen/marginLeft"
+        android:layout_marginEnd="@dimen/marginRight"
         android:enabled="false"
         android:text="@string/action_sign_in"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password"
-        app:layout_constraintVertical_bias="0.2" />
+        app:layout_constraintTop_toBottomOf="@+id/avatarImage"
+/>
 
     <ProgressBar
         android:id="@+id/loading"
@@ -83,14 +103,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
- />
+        />
 
-    <CheckBox
-        android:id="@+id/checkBox_register"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Register"
-        app:layout_constraintBottom_toTopOf="@+id/login"
-        app:layout_constraintStart_toStartOf="@+id/login"
-        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

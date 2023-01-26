@@ -11,6 +11,7 @@ import ru.netology.nework.dao.PostDao
 import ru.netology.nework.dao.UserDao
 import ru.netology.nework.dto.*
 import ru.netology.nework.entity.PostEntity
+import ru.netology.nework.entity.UserEntity
 import ru.netology.nework.entity.toDto
 import ru.netology.nework.entity.toEntity
 import ru.netology.nework.enumeration.AttachmentType
@@ -68,7 +69,6 @@ class PostRepositoryImpl @Inject constructor(
                     )
                 }
             }
-            println(users)
             postdao.insert(post.toEntity())
             users.map {
                 if (it != null) {
@@ -82,15 +82,87 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun save(post: Post) {
+    override suspend fun upload(upload: MediaRequest): MediaResponse {
         try {
-            val response = apiService.save(post)
+            val media = MultipartBody.Part.createFormData(
+                "file", upload.file.name, upload.file.asRequestBody()
+            )
+
+            val response = apiService.upload(media)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
 
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-            postdao.insert(PostEntity.fromDto(body))
+            return response.body() ?: throw ApiError(response.code(), response.message())
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun save(post: Post) {
+        try {
+            val postRequest = PostRequest(
+                post.id, post.content,
+                post.coords,
+                post.link,
+                post.attachment, post.mentionIds
+            )
+            val response = apiService.save(postRequest)
+
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+
+            val bodyResponse =
+                response.body() ?: throw ApiError(response.code(), response.message())
+            val postResponse = Post(
+                bodyResponse.id,
+                bodyResponse.authorId,
+                bodyResponse.author,
+                bodyResponse.authorAvatar,
+                bodyResponse.authorJob,
+                bodyResponse.content,
+                bodyResponse.published,
+                bodyResponse.coords,
+                bodyResponse.link,
+                bodyResponse.likeOwnerIds,
+                bodyResponse.mentionIds,
+                bodyResponse.mentionedMe,
+                bodyResponse.likedByMe,
+                bodyResponse.attachment,
+                bodyResponse.ownedByMe
+            )
+            val users =
+                bodyResponse.users?.map {
+                    Users(
+                        it.key.toLong(),
+                        it.value.name,
+                        it.value.avatar
+                    )
+                }
+
+            postdao.insert(PostEntity.fromDto(postResponse))
+            users?.map {
+                userdao.insert(UserEntity.fromDto(it))
+            }
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun saveWithAttachment(post: Post, upload: MediaRequest) {
+        try {
+            val media = upload(upload)
+            // TODO: add support for other types
+            val postWithAttachment =
+                post.copy(attachment = Attachment(media.url, AttachmentType.IMAGE))
+            save(postWithAttachment)
+        } catch (e: AppError) {
+            throw e
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -161,41 +233,6 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveWithAttachment(post: Post, upload: MediaUpload) {
-        try {
-            val media = upload(upload)
-            // TODO: add support for other types
-            val postWithAttachment =
-                post.copy(attachment = Attachment(media.id, AttachmentType.IMAGE))
-            save(postWithAttachment)
-        } catch (e: AppError) {
-            throw e
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
-        }
-    }
-
-    override suspend fun upload(upload: MediaUpload): Media {
-        try {
-            val media = MultipartBody.Part.createFormData(
-                "file", upload.file.name, upload.file.asRequestBody()
-            )
-
-            val response = apiService.upload(media)
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
-            }
-
-            return response.body() ?: throw ApiError(response.code(), response.message())
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
-        }
-    }
-
     override suspend fun userAuthentication(login: String, password: String): AuthState {
         try {
             val authResponse = apiService.userAuthentication(login, password)
@@ -247,8 +284,35 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun userGetById(id: Long): AuthState {
-        TODO("Not yet implemented")
+    override suspend fun userRegistrationWithAvatar(
+        login: String,
+        password: String,
+        name: String,
+        avatar: MediaRequest
+    ): AuthState {
+        try {
+            // val media = upload(avatar)
+            val media = MultipartBody.Part.createFormData(
+                "file", avatar.file.name, avatar.file.asRequestBody()
+            )
+
+            val authResponse = apiService.userRegistrationWithAvatar(login, password, name, media)
+
+            if (!authResponse.isSuccessful) {
+                throw ApiError(authResponse.code(), authResponse.message())
+            }
+
+            val id = authResponse.body()?.id ?: 0
+            val token = authResponse.body()?.token
+
+            return AuthState(id, token, name)
+
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
     }
+
 
 }

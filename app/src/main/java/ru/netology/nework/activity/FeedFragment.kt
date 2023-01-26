@@ -9,16 +9,19 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nework.R
+import ru.netology.nework.activity.MapsPreviewFragment.Companion.doubleArg1
+import ru.netology.nework.activity.MapsPreviewFragment.Companion.doubleArg2
 import ru.netology.nework.adapter.OnInteractionListener
 import ru.netology.nework.adapter.PostsAdapter
 import ru.netology.nework.databinding.FragmentFeedBinding
 import ru.netology.nework.dto.Post
-import ru.netology.nework.util.CompanionArg.Companion.doubleArg1
-import ru.netology.nework.util.CompanionArg.Companion.doubleArg2
 import ru.netology.nework.util.CompanionArg.Companion.textArg
 import ru.netology.nework.viewmodel.PostViewModel
+
+val coordinatesMoscow = Point(55.7522200, 37.6155600)
 
 @AndroidEntryPoint
 class FeedFragment : Fragment() {
@@ -36,6 +39,7 @@ class FeedFragment : Fragment() {
         val adapter = PostsAdapter(object : OnInteractionListener {
             override fun onEdit(post: Post) {
                 viewModel.edit(post)
+                findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
             }
 
             override fun onLike(post: Post) {
@@ -48,13 +52,13 @@ class FeedFragment : Fragment() {
             }
 
             override fun onPreviewMap(post: Post) {
-                if (post.coords != null)
-                    findNavController().navigate(R.id.action_feedFragment_to_mapsFragment,
+                if (post.coords != null && post.coords.lat != null && post.coords.long != null) {
+                    findNavController().navigate(R.id.action_feedFragment_to_mapsPreviewFragment,
                         Bundle().apply {
                             doubleArg1 = post.coords.lat.toDouble()
                             doubleArg2 = post.coords.long.toDouble()
                         })
-
+                }
             }
 
             override fun onPreviewImage(post: Post) {

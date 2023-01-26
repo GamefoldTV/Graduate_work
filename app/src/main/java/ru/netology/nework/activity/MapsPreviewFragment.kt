@@ -16,13 +16,18 @@ import com.yandex.mapkit.map.*
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.Runtime.getApplicationContext
 import com.yandex.runtime.image.ImageProvider
-import com.yandex.runtime.ui_view.ViewProvider
-import ru.netology.nework.databinding.FragmentMapBinding
-import ru.netology.nework.util.CompanionArg.Companion.doubleArg1
-import ru.netology.nework.util.CompanionArg.Companion.doubleArg2
-import ru.netology.nework.util.CompanionArg.Companion.textArg
+import dagger.hilt.android.AndroidEntryPoint
+import ru.netology.nework.databinding.FragmentMapPreviewBinding
+import ru.netology.nework.util.DoubleArg
 
-class MapsFragment : Fragment() {
+@AndroidEntryPoint
+class MapsPreviewFragment : Fragment() {
+
+    companion object{
+        var Bundle.doubleArg1: Double by DoubleArg
+        var Bundle.doubleArg2: Double by DoubleArg
+    }
+
     private var mapView: MapView? = null
 
     override fun onCreateView(
@@ -30,12 +35,13 @@ class MapsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentMapBinding.inflate(layoutInflater)
+        val binding = FragmentMapPreviewBinding.inflate(layoutInflater)
 
         mapView = binding.mapview
 
-        val markerLatitude = requireArguments().doubleArg1
-        val markerLongitude = requireArguments().doubleArg2
+        val markerLatitude = (arguments?.doubleArg1 ?: 0.0).toDouble()
+        val markerLongitude =(arguments?.doubleArg2 ?: 0.0).toDouble()
+       // routeStartLocation = Point(markerLatitude, markerLongitude)
 
 
         mapView?.getMap()?.move(

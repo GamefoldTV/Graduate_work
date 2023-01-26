@@ -34,7 +34,7 @@ interface ApiService {
     suspend fun getById(@Path("id") id: Long): Response<PostResponse>
 
     @POST("posts")
-    suspend fun save(@Body post: Post): Response<Post>
+    suspend fun save(@Body postRequest: PostRequest): Response<PostResponse>
 
     @DELETE("posts/{id}")
     suspend fun removeById(@Path("id") id: Long): Response<Unit>
@@ -47,7 +47,7 @@ interface ApiService {
 
     @Multipart
     @POST("media")
-    suspend fun upload(@Part media: MultipartBody.Part): Response<Media>
+    suspend fun upload(@Part file: MultipartBody.Part): Response<MediaResponse>
 
     @FormUrlEncoded
     @POST("users/authentication")
@@ -62,6 +62,16 @@ interface ApiService {
         @Field("login") login: String,
         @Field("password") password: String,
         @Field("name") name: String,
+    ): Response<AuthenticationResponse>
+
+    @FormUrlEncoded
+    @Multipart
+    @POST("users/registration")
+    suspend fun userRegistrationWithAvatar(
+        @Field("login") login: String,
+        @Field("password") password: String,
+        @Field("name") name: String,
+        @Field("file") file: MultipartBody.Part,
     ): Response<AuthenticationResponse>
 
     @GET("users/{user_id}")

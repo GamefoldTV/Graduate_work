@@ -8,8 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nework.BuildConfig
-import ru.netology.nework.activity.NewPostFragment.Companion.textArg
+
 import ru.netology.nework.databinding.FragmentImagePreviewBinding
+import ru.netology.nework.util.CompanionArg.Companion.textArg
 import ru.netology.nework.view.load
 
 @AndroidEntryPoint

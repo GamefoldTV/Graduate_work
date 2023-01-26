@@ -24,14 +24,21 @@
             android:id="@+id/action_feedFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
         <action
-            android:id="@+id/action_feedFragment_to_mapsFragment"
-            app:destination="@id/mapsFragment" />
+            android:id="@+id/action_feedFragment_to_mapsPreviewFragment"
+            app:destination="@id/mapsPreviewFragment" />
+        <action
+            android:id="@+id/action_feedFragment_to_mapsNewMarkerFragment"
+            app:destination="@id/mapsNewMarkerFragment" />
     </fragment>
     <fragment
         android:id="@+id/newPostFragment"
         android:name="ru.netology.nework.activity.NewPostFragment"
         android:label="fragment_new_post"
-        tools:layout="@layout/fragment_new_post" />
+        tools:layout="@layout/fragment_new_post" >
+        <action
+            android:id="@+id/action_newPostFragment_to_mapsNewMarkerFragment"
+            app:destination="@id/mapsNewMarkerFragment" />
+    </fragment>
     <fragment
         android:id="@+id/imagePreviewFragment"
         android:name="ru.netology.nework.activity.ImagePreviewFragment"
@@ -41,7 +48,11 @@
         android:name="ru.netology.nework.activity.LoginFragment"
         android:label="LoginFragment" />
     <fragment
-        android:id="@+id/mapsFragment"
-        android:name="ru.netology.nework.activity.MapsFragment"
-        android:label="MapsFragment" />
+        android:id="@+id/mapsPreviewFragment"
+        android:name="ru.netology.nework.activity.MapsPreviewFragment"
+        android:label="MapsPreviewFragment" />
+    <fragment
+        android:id="@+id/mapsNewMarkerFragment"
+        android:name="ru.netology.nework.activity.MapsNewMarkerFragment"
+        android:label="MapsNewMarkerFragment" />
 </navigation>

@@ -1,11 +1,12 @@
 package ru.netology.nework.activity
 
-import android.app.Activity
+import  android.app.Activity
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toFile
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -14,17 +15,16 @@ import com.github.dhaval2404.imagepicker.constant.ImageProvider
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nework.R
+import ru.netology.nework.activity.MapsNewMarkerFragment.Companion.latArg
+import ru.netology.nework.activity.MapsNewMarkerFragment.Companion.longArg
 import ru.netology.nework.databinding.FragmentNewPostBinding
 import ru.netology.nework.util.AndroidUtils
 import ru.netology.nework.util.StringArg
+import ru.netology.nework.view.load
 import ru.netology.nework.viewmodel.PostViewModel
 
 @AndroidEntryPoint
 class NewPostFragment : Fragment() {
-
-    companion object {
-        var Bundle.textArg: String? by StringArg
-    }
 
     private val viewModel: PostViewModel by viewModels(
         ownerProducer = ::requireParentFragment,
@@ -45,7 +45,12 @@ class NewPostFragment : Fragment() {
         return when (item.itemId) {
             R.id.save -> {
                 fragmentBinding?.let {
-                    viewModel.changeContent(it.edit.text.toString())
+                    viewModel.changeContent(it.editContent.text.toString())
+                    viewModel.changeLink(it.editLink.text.toString())
+                    viewModel.changeCoords(
+                        viewModel.coords.value?.lat,
+                        viewModel.coords.value?.long
+                    )
                     viewModel.save()
                     AndroidUtils.hideKeyboard(requireView())
                 }
@@ -67,10 +72,22 @@ class NewPostFragment : Fragment() {
         )
         fragmentBinding = binding
 
-        arguments?.textArg
-            ?.let(binding.edit::setText)
 
-        binding.edit.requestFocus()
+        val editPost = viewModel.getEditPost()
+        binding.editContent.setText(editPost?.content)
+        binding.editLink.setText(editPost?.link)
+        val lat = editPost?.coords?.lat
+        val long = editPost?.coords?.long
+        if (lat!=null && long!=null)
+            viewModel.changeCoordsFromMap(lat, long)
+        val attachment = editPost?.attachment
+        if (attachment != null) viewModel.changePhoto(Uri.parse(attachment.url), null)
+        if (attachment?.url != null) {
+            binding.AttachmentImage.load(attachment.url)
+            binding.AttachmentContainer.visibility = View.VISIBLE
+            }
+
+        binding.editContent.requestFocus()
 
         val pickPhotoLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -115,18 +132,38 @@ class NewPostFragment : Fragment() {
             viewModel.changePhoto(null, null)
         }
 
+        binding.buttonLocationOn.setOnClickListener {
+            findNavController().navigate(R.id.action_newPostFragment_to_mapsNewMarkerFragment,
+                Bundle().apply {
+                    latArg = viewModel.coords.value?.lat?.toDouble() ?: coordinatesMoscow.latitude
+                    longArg = viewModel.coords.value?.long?.toDouble() ?: coordinatesMoscow.longitude
+                })
+        }
+
+        binding.buttonLocationOff.setOnClickListener {
+            viewModel.changeCoordsFromMap("", "")
+            viewModel.changeCoords("", "")
+        }
+
+
         viewModel.postCreated.observe(viewLifecycleOwner) {
             findNavController().navigateUp()
         }
 
+        viewModel.coords.observe(viewLifecycleOwner) {
+            binding.textCoordLat.text = viewModel.coords.value?.lat
+            binding.textCoordLong.text = viewModel.coords.value?.long
+        }
+
         viewModel.photo.observe(viewLifecycleOwner) {
+            val url = viewModel.getEditPost()?.attachment?.url
             if (it.uri == null) {
-                binding.photoContainer.visibility = View.GONE
+                binding.AttachmentContainer.visibility = View.GONE
                 return@observe
             }
-
-            binding.photoContainer.visibility = View.VISIBLE
-            binding.photo.setImageURI(it.uri)
+            // загрузили новый аттач
+            binding.AttachmentContainer.visibility = View.VISIBLE
+            binding.AttachmentImage.setImageURI(it.uri)
         }
 
         return binding.root

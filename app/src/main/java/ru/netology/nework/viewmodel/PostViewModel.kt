@@ -1,6 +1,7 @@
 package ru.netology.nework.viewmodel
 
 import android.net.Uri
+import androidx.core.net.toFile
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -10,10 +11,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.netology.nework.auth.AppAuth
 import ru.netology.nework.auth.LoginFormState
-import ru.netology.nework.dto.Attachment
-import ru.netology.nework.dto.Coordinates
-import ru.netology.nework.dto.MediaUpload
+import ru.netology.nework.dto.*
 import ru.netology.nework.dto.Post
+import ru.netology.nework.enumeration.AttachmentType
 import ru.netology.nework.model.FeedModel
 import ru.netology.nework.model.FeedModelState
 import ru.netology.nework.model.PhotoModel
@@ -32,24 +32,8 @@ private val empty = Post(
     likedByMe = false,
 )
 
-data class Post(
-    val id: Long,
-    val authorId: Long,
-    val author: String,
-    val authorAvatar: String?,
-    val content: String,
-    val published: Long,
-    val coords : Coordinates? = null,
-    val link : String?,
-    val likeOwnerIds : List<Long> = emptyList(),
-    val mentionIds : List<Long> = emptyList(),
-    val mentionedMe : Boolean = false,
-    val likedByMe : Boolean = false,
-    val ownedByMe : Boolean = false,
-    val attachment : Attachment?,
-)
-
 private val noPhoto = PhotoModel()
+private val noCoords = Coordinates()
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -76,7 +60,8 @@ class PostViewModel @Inject constructor(
     val authState: LiveData<LoginFormState>
         get() = _authState
 
-    private val edited = MutableLiveData(empty)
+    private val editedPost = MutableLiveData(empty)
+
     private val _postCreated = SingleLiveEvent<Unit>()
     val postCreated: LiveData<Unit>
         get() = _postCreated
@@ -84,6 +69,10 @@ class PostViewModel @Inject constructor(
     private val _photo = MutableLiveData(noPhoto)
     val photo: LiveData<PhotoModel>
         get() = _photo
+
+    private val _coords = MutableLiveData(noCoords)
+    val coords: LiveData<Coordinates>
+        get() = _coords
 
     init {
         loadPosts()
@@ -110,14 +99,19 @@ class PostViewModel @Inject constructor(
     }
 
     fun save() {
-        edited.value?.let {
+        editedPost.value?.let { post ->
             _postCreated.value = Unit
             viewModelScope.launch {
                 try {
                     when(_photo.value) {
-                        noPhoto -> repository.save(it)
+                        noPhoto -> {
+                            var postNew = post
+                            if (post.attachment != null)
+                                postNew = post.copy(attachment = null)
+                            repository.save(postNew)
+                        }
                         else -> _photo.value?.file?.let { file ->
-                            repository.saveWithAttachment(it, MediaUpload(file))
+                            repository.saveWithAttachment(post, MediaRequest(file))
                         }
                     }
                     _dataState.value = FeedModelState()
@@ -126,24 +120,61 @@ class PostViewModel @Inject constructor(
                 }
             }
         }
-        edited.value = empty
+        editedPost.value = empty
         _photo.value = noPhoto
+        _coords.value = noCoords
     }
 
     fun edit(post: Post) {
-        edited.value = post
+        editedPost.value = post
     }
 
     fun changeContent(content: String) {
         val text = content.trim()
-        if (edited.value?.content == text) {
+        if (editedPost.value?.content == text) {
             return
         }
-        edited.value = edited.value?.copy(content = text)
+        editedPost.value = editedPost.value?.copy(content = text)
+    }
+
+    fun changeLink(link : String){
+        val text = if (link.isEmpty())
+            null
+        else
+            link.trim()
+
+        if (editedPost.value?.link == text) {
+            return
+        }
+        editedPost.value = editedPost.value?.copy(link = text)
+    }
+
+    fun changeCoords(lat: String?, long: String?){
+        val coords = if (lat==null && long==null)
+            null
+        else
+            Coordinates(lat,long)
+
+        if (editedPost.value?.coords == coords) {
+            return
+        }
+        editedPost.value = editedPost.value?.copy(coords = coords)
     }
 
     fun changePhoto(uri: Uri?, file: File?) {
         _photo.value = PhotoModel(uri, file)
+     //   editedPost.value = editedPost.value?.copy(attachment = Attachment(uri.toString(), AttachmentType.IMAGE))
+    }
+
+    fun removeAttachment(){
+        editedPost.value = editedPost.value?.copy(attachment = null)
+    }
+
+    fun changeCoordsFromMap(lat: String, long: String){
+        _coords.value = if (lat.isBlank() && long.isBlank())
+            null
+        else
+            Coordinates(lat,long)
     }
 
     fun removeById(id: Long) = viewModelScope.launch {
@@ -161,6 +192,8 @@ class PostViewModel @Inject constructor(
             _dataState.value = FeedModelState(error = true)
         }
     }
-
+    fun getEditPost() : Post? {
+        return editedPost.value
+    }
 
 }

@@ -30,9 +30,14 @@
     <string name="sign_in">Вход</string>
     <string name="sign_up">Регистрация</string>
     <string name="sign_out">Выход</string>
-    <string name="prompt_login">Логин</string>
-    <string name="prompt_password">Пароль</string>
+    <string name="login_login">Логин</string>
+    <string name="login_password">Пароль</string>
     <string name="action_sign_in">Войти или зарегистрироваться</string>
     <string name="guest_entrance">Гостевой вход</string>
     <string name="welcome">"Добро пожаловать "</string>
+    <string name="new_post_content">Содержание:</string>
+    <string name="new_post_link">Ссылка:</string>
+    <string name="new_post_coords">Местоположение:</string>
+    <string name="login_register">Регистрация</string>
+    <string name="login_name">Имя</string>
 </resources>

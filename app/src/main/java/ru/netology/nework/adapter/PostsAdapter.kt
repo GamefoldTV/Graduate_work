@@ -55,16 +55,16 @@ class PostViewHolder(
             author.text = post.author
 
             if (post.authorJob.isNullOrBlank()) {
-                authorJob.visibility = 8
+                authorJob.visibility = View.GONE
             } else {
                 authorJob.text = post.authorJob
-                authorJob.visibility = 0
+                authorJob.visibility = View.VISIBLE
             }
             published.text = convertString2Date2String(post.published)
 
             content.text = post.content
 
-            if (post.link != null) content.text = "${content.text} ${post.link}"
+            if (post.link != null) content.text = "${content.text} \n${post.link}"
 
             if (post.authorAvatar != null)
                 avatar.loadCircleCrop(post.authorAvatar)
@@ -76,16 +76,16 @@ class PostViewHolder(
 
             when (post.attachment?.type) {
                 AttachmentType.IMAGE -> {
-                    AttachmentFrame.visibility = 0
-                    AttachmentImage.visibility = 0
-                    AttachmentVideo.visibility = 8
+                    AttachmentFrame.visibility = View.VISIBLE
+                    AttachmentImage.visibility = View.VISIBLE
+                    AttachmentVideo.visibility = View.GONE
                     AttachmentImage.load(post.attachment.url)
                 }
                 AttachmentType.VIDEO -> {
-                    AttachmentFrame.visibility = 0
-                    AttachmentImage.visibility = 8
+                    AttachmentFrame.visibility = View.VISIBLE
+                    AttachmentImage.visibility = View.GONE
                     AttachmentVideo.apply {
-                        visibility = 0
+                        visibility = View.VISIBLE
                         setMediaController(MediaController(binding.root.context))
                         setVideoURI(Uri.parse(post.attachment.url))
                         setOnPreparedListener {
@@ -100,10 +100,10 @@ class PostViewHolder(
 
                 }
                 AttachmentType.AUDIO -> {
-                    AttachmentFrame.visibility = 0
-                    AttachmentImage.visibility = 8
+                    AttachmentFrame.visibility = View.VISIBLE
+                    AttachmentImage.visibility = View.GONE
                     AttachmentVideo.apply {
-                        visibility = 0
+                        visibility = View.VISIBLE
                         setMediaController(MediaController(binding.root.context))
                         setVideoURI(Uri.parse(post.attachment.url))
                         setBackgroundResource(R.drawable.audio2)
@@ -116,7 +116,7 @@ class PostViewHolder(
                     }
                 }
                 null -> {
-                    AttachmentFrame.visibility = 8
+                    AttachmentFrame.visibility = View.GONE
                 }
             }
 
@@ -132,7 +132,7 @@ class PostViewHolder(
                                 onInteractionListener.onRemove(post)
                                 true
                             }
-                            R.id.edit -> {
+                            R.id.edit_content -> {
                                 onInteractionListener.onEdit(post)
                                 true
                             }

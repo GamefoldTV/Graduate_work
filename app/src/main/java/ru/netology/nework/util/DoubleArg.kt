@@ -7,7 +7,7 @@ import kotlin.reflect.KProperty
 object DoubleArg: ReadWriteProperty<Bundle, Double> {
 
     override fun setValue(thisRef: Bundle, property: KProperty<*>, value: Double) {
-        thisRef.putDouble(property.name, value!!)
+        thisRef.putDouble(property.name, value)
     }
 
     override fun getValue(thisRef: Bundle, property: KProperty<*>): Double =
