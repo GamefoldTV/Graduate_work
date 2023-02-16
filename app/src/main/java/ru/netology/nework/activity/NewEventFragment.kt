@@ -1,8 +1,12 @@
 package ru.netology.nework.activity
 
 import android.app.Activity
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.os.Bundle
+import android.text.format.DateFormat
 import android.view.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toFile
@@ -16,23 +20,24 @@ import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nework.R
 import ru.netology.nework.activity.MapsNewMarkerFragment.Companion.latArg
 import ru.netology.nework.activity.MapsNewMarkerFragment.Companion.longArg
-import ru.netology.nework.databinding.FragmentNewPostBinding
+import ru.netology.nework.databinding.FragmentNewEventBinding
 import ru.netology.nework.util.AndroidUtils
 import ru.netology.nework.view.load
-import ru.netology.nework.viewmodel.PostViewModel
+import ru.netology.nework.viewmodel.EventViewModel
+import java.util.*
+
 
 @AndroidEntryPoint
-class NewPostFragment : Fragment() {
-
-    private val viewModel: PostViewModel by viewModels(
+class NewEventFragment : Fragment() {
+    private val viewModel: EventViewModel by viewModels(
         ownerProducer = ::requireParentFragment,
     )
 
-    private var fragmentBinding: FragmentNewPostBinding? = null
+    private var fragmentBinding: FragmentNewEventBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true) // сообщаем о наличии меню
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -43,13 +48,18 @@ class NewPostFragment : Fragment() {
         return when (item.itemId) {
             R.id.save -> {
                 fragmentBinding?.let {
+                    viewModel.changeDateTime(
+                        it.editTextDate.text.toString(),
+                        it.editTextTime.text.toString()
+                    )
                     viewModel.changeContent(it.editContent.text.toString())
                     viewModel.changeLink(it.editLink.text.toString())
                     viewModel.changeCoords(
                         viewModel.coords.value?.lat,
                         viewModel.coords.value?.long
                     )
-                    viewModel.save()
+                    viewModel.changeSpeakers(it.editSpeakers.text.toString())
+                    viewModel.saveEvent()
                     AndroidUtils.hideKeyboard(requireView())
                 }
                 true
@@ -63,7 +73,7 @@ class NewPostFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentNewPostBinding.inflate(
+        val binding = FragmentNewEventBinding.inflate(
             inflater,
             container,
             false
@@ -71,19 +81,60 @@ class NewPostFragment : Fragment() {
         fragmentBinding = binding
 
 
-        val editPost = viewModel.getEditPost()
+        val editPost = viewModel.getEditEvent()
         binding.editContent.setText(editPost?.content)
         binding.editLink.setText(editPost?.link)
         val lat = editPost?.coords?.lat
         val long = editPost?.coords?.long
-        if (lat!=null && long!=null)
+        if (lat != null && long != null)
             viewModel.changeCoordsFromMap(lat, long)
         val attachment = editPost?.attachment
         if (attachment != null) viewModel.changePhoto(Uri.parse(attachment.url), null)
         if (attachment?.url != null) {
             binding.AttachmentImage.load(attachment.url)
             binding.AttachmentContainer.visibility = View.VISIBLE
+        }
+
+        var cal = Calendar.getInstance()
+        binding.editTextDate.setText(SimpleDateFormat("dd.MM.yyyy").format(System.currentTimeMillis()))
+        binding.editTextTime.setText(SimpleDateFormat("HH:mm").format(System.currentTimeMillis()))
+
+        val dateSetListener =
+            DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+                cal.set(Calendar.YEAR, year)
+                cal.set(Calendar.MONTH, monthOfYear)
+                cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                val myFormat = "dd.MM.yyyy" // mention the format you need
+                val sdf = SimpleDateFormat(myFormat, Locale.getDefault())
+                binding.editTextDate.setText(sdf.format(cal.time))
             }
+
+        val timeSetListener = TimePickerDialog.OnTimeSetListener { view, hour, minute ->
+            cal.set(Calendar.HOUR_OF_DAY, hour)
+            cal.set(Calendar.MINUTE, minute)
+            //   DateFormat.is24HourFormat(binding.root.context)
+            val myFormat = "HH:mm" // mention the format you need
+            val sdf = SimpleDateFormat(myFormat, Locale.getDefault())
+            binding.editTextTime.setText(sdf.format(cal.time))
+        }
+
+        binding.buttonChangeDate.setOnClickListener {
+            DatePickerDialog(
+                binding.root.context, dateSetListener,
+                cal.get(Calendar.YEAR),
+                cal.get(Calendar.MONTH),
+                cal.get(Calendar.DAY_OF_MONTH)
+            ).show()
+        }
+
+        binding.buttonChangeTime.setOnClickListener {
+            TimePickerDialog(
+                binding.root.context, timeSetListener,
+                cal.get(Calendar.HOUR_OF_DAY),
+                cal.get(Calendar.MINUTE),
+                DateFormat.is24HourFormat(binding.root.context)
+            ).show()
+        }
 
         binding.editContent.requestFocus()
 
@@ -131,10 +182,11 @@ class NewPostFragment : Fragment() {
         }
 
         binding.buttonLocationOn.setOnClickListener {
-            findNavController().navigate(R.id.action_newPostFragment_to_mapsNewMarkerFragment,
+            findNavController().navigate(R.id.action_newEventFragment_to_mapsNewMarkerFragment,
                 Bundle().apply {
                     latArg = viewModel.coords.value?.lat?.toDouble() ?: coordinatesMoscow.latitude
-                    longArg = viewModel.coords.value?.long?.toDouble() ?: coordinatesMoscow.longitude
+                    longArg =
+                        viewModel.coords.value?.long?.toDouble() ?: coordinatesMoscow.longitude
                 })
         }
 
@@ -144,7 +196,7 @@ class NewPostFragment : Fragment() {
         }
 
 
-        viewModel.postCreated.observe(viewLifecycleOwner) {
+        viewModel.eventCreated.observe(viewLifecycleOwner) {
             findNavController().navigateUp()
         }
 
@@ -154,7 +206,7 @@ class NewPostFragment : Fragment() {
         }
 
         viewModel.photo.observe(viewLifecycleOwner) {
-            val url = viewModel.getEditPost()?.attachment?.url
+            val url = viewModel.getEditEvent()?.attachment?.url
             if (it.uri == null) {
                 binding.AttachmentContainer.visibility = View.GONE
                 return@observe

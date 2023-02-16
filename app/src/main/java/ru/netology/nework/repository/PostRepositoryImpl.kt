@@ -7,13 +7,11 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import ru.netology.nework.api.*
 import ru.netology.nework.auth.AuthState
+import ru.netology.nework.dao.EventDao
 import ru.netology.nework.dao.PostDao
 import ru.netology.nework.dao.UserDao
 import ru.netology.nework.dto.*
-import ru.netology.nework.entity.PostEntity
-import ru.netology.nework.entity.UserEntity
-import ru.netology.nework.entity.toDto
-import ru.netology.nework.entity.toEntity
+import ru.netology.nework.entity.*
 import ru.netology.nework.enumeration.AttachmentType
 import ru.netology.nework.error.ApiError
 import ru.netology.nework.error.AppError
@@ -26,14 +24,22 @@ import javax.inject.Singleton
 @Singleton
 class PostRepositoryImpl @Inject constructor(
     private val postdao: PostDao,
+    private val eventdao: EventDao,
     private val userdao: UserDao,
     private val apiService: ApiService,
-    ) : PostRepository {
-    override val data = postdao.getAll()
+) : PostRepository {
+    override val posts = postdao.getPosts()
         .map(List<PostEntity>::toDto)
         .flowOn(Dispatchers.Default)
+    override val events = eventdao.getEvents()
+        .map(List<EventEntity>::toDto)
+        .flowOn(Dispatchers.Default)
+    override val users = userdao.getUsers()
+        .map(List<UserEntity>::toDto)
+        .flowOn(Dispatchers.Default)
 
-    override suspend fun getAll() {
+
+    override suspend fun getPosts() {
         try {
             val response = apiService.getAll()
             if (!response.isSuccessful) {
@@ -314,5 +320,306 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getUsersByIds(ids: List<Long>): List<Users> {
+        TODO("Not yet implemented")
+    }
 
+    override suspend fun getEvents() {
+        try {
+            val response = apiService.getEvents()
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            val bodyResponse =
+                response.body() ?: throw ApiError(response.code(), response.message())
+            val event = bodyResponse.map {
+                Event(
+                    it.id,
+                    it.authorId,
+                    it.author,
+                    it.authorAvatar,
+                    it.authorJob,
+                    it.content,
+                    it.datetime,
+                    it.published,
+                    it.coords,
+                    it.type,
+                    it.likeOwnerIds,
+                    it.likedByMe,
+                    it.speakerIds,
+                    it.participantsIds,
+                    it.participatedByMe,
+                    it.attachment,
+                    it.link,
+                    it.ownedByMe
+                )
+            }
+            val users = bodyResponse.map {
+                it.users?.map {
+                    Users(
+                        it.key.toLong(),
+                        it.value.name,
+                        it.value.avatar
+                    )
+                }
+            }
+            eventdao.insert(event.toEntity())
+            users.map {
+                if (it != null) {
+                    userdao.insert(it.toEntity())
+                }
+            }
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun saveEvent(event: Event) {
+        try {
+            val eventRequest = EventRequest(
+                event.id,
+                event.content,
+                event.datetime,
+                event.coords,
+                event.type,
+                event.attachment,
+                event.link,
+                event.speakerIds
+            )
+            val response = apiService.saveEvent(eventRequest)
+
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+
+            val bodyResponse =
+                response.body() ?: throw ApiError(response.code(), response.message())
+            val eventResponse = Event(
+                bodyResponse.id,
+                bodyResponse.authorId,
+                bodyResponse.author,
+                bodyResponse.authorAvatar,
+                bodyResponse.authorJob,
+                bodyResponse.content,
+                bodyResponse.datetime,
+                bodyResponse.published,
+                bodyResponse.coords,
+                bodyResponse.type,
+                bodyResponse.likeOwnerIds,
+                bodyResponse.likedByMe,
+                bodyResponse.speakerIds,
+                bodyResponse.participantsIds,
+                bodyResponse.participatedByMe,
+                bodyResponse.attachment,
+                bodyResponse.link,
+                bodyResponse.ownedByMe
+            )
+            val users =
+                bodyResponse.users?.map {
+                    Users(
+                        it.key.toLong(),
+                        it.value.name,
+                        it.value.avatar
+                    )
+                }
+            eventdao.insert(EventEntity.fromDto(eventResponse))
+            users?.map {
+                userdao.insert(UserEntity.fromDto(it))
+            }
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun saveEventWithAttachment(event: Event, upload: MediaRequest) {
+        try {
+            val media = upload(upload)
+            val eventWithAttachment =
+                event.copy(attachment = Attachment(media.url, AttachmentType.IMAGE))
+            saveEvent(eventWithAttachment)
+        } catch (e: AppError) {
+            throw e
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun likeEventById(id: Long, likedByMe: Boolean) {
+        try {
+            if (likedByMe) {
+                val response = apiService.dislikeEventById(id)
+                if (!response.isSuccessful) {
+                    throw ApiError(response.code(), response.message())
+                }
+                val event =
+                    response.body()?.let {
+                        Event(
+                            it.id,
+                            it.authorId,
+                            it.author,
+                            it.authorAvatar,
+                            it.authorJob,
+                            it.content,
+                            it.datetime,
+                            it.published,
+                            it.coords,
+                            it.type,
+                            it.likeOwnerIds,
+                            it.likedByMe,
+                            it.speakerIds,
+                            it.participantsIds,
+                            it.participatedByMe,
+                            it.attachment,
+                            it.link,
+                            it.ownedByMe
+                        )
+                    } ?: throw ApiError(response.code(), response.message())
+                eventdao.insert(EventEntity.fromDto(event))
+            } else {
+                val response = apiService.likeEventById(id)
+                if (!response.isSuccessful) {
+                    throw ApiError(response.code(), response.message())
+                }
+                val event =
+                    response.body()?.let {
+                        Event(
+                            it.id,
+                            it.authorId,
+                            it.author,
+                            it.authorAvatar,
+                            it.authorJob,
+                            it.content,
+                            it.datetime,
+                            it.published,
+                            it.coords,
+                            it.type,
+                            it.likeOwnerIds,
+                            it.likedByMe,
+                            it.speakerIds,
+                            it.participantsIds,
+                            it.participatedByMe,
+                            it.attachment,
+                            it.link,
+                            it.ownedByMe
+                        )
+                    } ?: throw ApiError(response.code(), response.message())
+                eventdao.insert(EventEntity.fromDto(event))
+            }
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun removeEventById(id: Long) {
+        try {
+            eventdao.removeById(id)
+            val response = apiService.removeById(id)
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun partEventById(id: Long, participatedByMe: Boolean) {
+        try {
+            if (participatedByMe) {
+                val response = apiService.nonPartEventById(id)
+                if (!response.isSuccessful) {
+                    throw ApiError(response.code(), response.message())
+                }
+                val event =
+                    response.body()?.let {
+                        Event(
+                            it.id,
+                            it.authorId,
+                            it.author,
+                            it.authorAvatar,
+                            it.authorJob,
+                            it.content,
+                            it.datetime,
+                            it.published,
+                            it.coords,
+                            it.type,
+                            it.likeOwnerIds,
+                            it.likedByMe,
+                            it.speakerIds,
+                            it.participantsIds,
+                            it.participatedByMe,
+                            it.attachment,
+                            it.link,
+                            it.ownedByMe
+                        )
+                    } ?: throw ApiError(response.code(), response.message())
+                eventdao.insert(EventEntity.fromDto(event))
+            } else {
+                val response = apiService.partEventById(id)
+                if (!response.isSuccessful) {
+                    throw ApiError(response.code(), response.message())
+                }
+                val event =
+                    response.body()?.let {
+                        Event(
+                            it.id,
+                            it.authorId,
+                            it.author,
+                            it.authorAvatar,
+                            it.authorJob,
+                            it.content,
+                            it.datetime,
+                            it.published,
+                            it.coords,
+                            it.type,
+                            it.likeOwnerIds,
+                            it.likedByMe,
+                            it.speakerIds,
+                            it.participantsIds,
+                            it.participatedByMe,
+                            it.attachment,
+                            it.link,
+                            it.ownedByMe
+                        )
+                    } ?: throw ApiError(response.code(), response.message())
+                eventdao.insert(EventEntity.fromDto(event))
+            }
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun getUsers() {
+        try {
+            val response = apiService.getUsers()
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            val bodyResponse =
+                response.body() ?: throw ApiError(response.code(), response.message())
+            val users = bodyResponse.map {
+                Users(
+                    it.id,
+                    it.name,
+                    it.avatar
+                )
+            }
+            userdao.insert(users.toEntity())
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
 }

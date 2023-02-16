@@ -7,11 +7,14 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
+import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nework.R
 import ru.netology.nework.auth.AppAuth
 import ru.netology.nework.viewmodel.AuthViewModel
 import javax.inject.Inject
+
+val coordinatesMoscow = Point(55.7522200, 37.6155600)
 
 @AndroidEntryPoint
 class AppActivity : AppCompatActivity(R.layout.activity_app) {
@@ -37,12 +40,24 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
-
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.wall -> {
+                true
+            }
+            R.id.posts -> {
+                findNavController(R.id.nav_host_fragment).navigateUp()
+                true
+            }
+            R.id.events -> {
+                findNavController(R.id.nav_host_fragment).navigateUp()
+                findNavController(R.id.nav_host_fragment)
+                    .navigate(R.id.action_feedFragment_to_feedEventFragment)
+                true
+            }
             R.id.signout -> {
                 auth.removeAuth()
                 true

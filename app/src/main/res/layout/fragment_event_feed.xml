@@ -8,13 +8,14 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <TextView
             android:id="@+id/headerEvents"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/marginLeft"
             android:layout_marginTop="@dimen/marginTop"
-            android:text="@string/header_posts"
+            android:text="@string/header_events"
             android:visibility="visible"
             android:textSize="@dimen/textView_header_textSize"
             app:autoSizeTextType="none"
@@ -39,7 +40,7 @@
             android:id="@+id/emptyText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/empty_posts"
+            android:text="@string/empty_events"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -69,7 +70,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/card_post" />
+                tools:listitem="@layout/card_event" />
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
@@ -79,11 +80,11 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:clickable="true"
         android:contentDescription="@string/add_post"
         android:focusable="true"
-        android:layout_gravity="bottom|end"
         app:srcCompat="@drawable/ic_add_24dp" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

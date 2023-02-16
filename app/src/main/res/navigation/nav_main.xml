@@ -27,8 +27,8 @@
             android:id="@+id/action_feedFragment_to_mapsPreviewFragment"
             app:destination="@id/mapsPreviewFragment" />
         <action
-            android:id="@+id/action_feedFragment_to_mapsNewMarkerFragment"
-            app:destination="@id/mapsNewMarkerFragment" />
+            android:id="@+id/action_feedFragment_to_feedEventFragment"
+            app:destination="@id/feedEventFragment" />
     </fragment>
     <fragment
         android:id="@+id/newPostFragment"
@@ -55,4 +55,23 @@
         android:id="@+id/mapsNewMarkerFragment"
         android:name="ru.netology.nework.activity.MapsNewMarkerFragment"
         android:label="MapsNewMarkerFragment" />
+    <fragment
+        android:id="@+id/feedEventFragment"
+        android:name="ru.netology.nework.activity.FeedEventFragment"
+        android:label="FeedEventFragment" >
+        <action
+            android:id="@+id/action_feedEventFragment_to_mapsPreviewFragment"
+            app:destination="@id/mapsPreviewFragment" />
+        <action
+            android:id="@+id/action_feedEventFragment_to_newEventFragment"
+            app:destination="@id/newEventFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/newEventFragment"
+        android:name="ru.netology.nework.activity.NewEventFragment"
+        android:label="NewEventFragment" >
+        <action
+            android:id="@+id/action_newEventFragment_to_mapsNewMarkerFragment"
+            app:destination="@id/mapsNewMarkerFragment" />
+    </fragment>
 </navigation>

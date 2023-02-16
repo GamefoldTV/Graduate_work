@@ -70,7 +70,6 @@ class MapsNewMarkerFragment : Fragment(), UserLocationObjectListener, CameraList
         return when (item.itemId) {
 
             R.id.save -> {
-
                 fragmentBinding?.let {
                     if (it.editLatitude.text.isEmpty() ||
                         it.editLongitude.text.isEmpty()
@@ -78,10 +77,6 @@ class MapsNewMarkerFragment : Fragment(), UserLocationObjectListener, CameraList
                         Snackbar.make(it.root, "Data id empty", Snackbar.LENGTH_LONG)
                             .show()
                     } else {
-                /*        viewModel.changeCoordsFromMap(
-                            it.editLatitude.text.toString(),
-                            it.editLongitude.text.toString()
-                        )*/
                         viewModel.changeCoords(
                             it.editLatitude.text.toString(),
                             it.editLongitude.text.toString()

@@ -11,5 +11,6 @@
     <dimen name="marginLeft">24dp</dimen>
     <dimen name="marginRight">24dp</dimen>
     <dimen name="marginTop">24dp</dimen>
+    <dimen name="textView_header_textSize">20sp</dimen>
 </resources>
 

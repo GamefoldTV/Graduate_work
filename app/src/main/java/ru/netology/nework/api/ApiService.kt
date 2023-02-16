@@ -27,6 +27,7 @@ fun retrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()
     .build()
 
 interface ApiService {
+    //==========POSTS=====================================================================
     @GET("posts")
     suspend fun getAll(): Response<List<PostResponse>>
 
@@ -48,7 +49,7 @@ interface ApiService {
     @Multipart
     @POST("media")
     suspend fun upload(@Part file: MultipartBody.Part): Response<MediaResponse>
-
+    //==========Authentication| Users===========================================================
     @FormUrlEncoded
     @POST("users/authentication")
     suspend fun userAuthentication(
@@ -76,4 +77,30 @@ interface ApiService {
 
     @GET("users/{user_id}")
     suspend fun getUserById(@Path("user_id") user_id: Long?): Response<UserResponse>
+
+    @GET("users")
+    suspend fun getUsers(): Response<List<UserResponse>>
+    //==========Events===========================================================
+    @GET("events")
+    suspend fun getEvents(): Response<List<EventResponse>>
+    @GET("events/{id}")
+    suspend fun getEventById(@Path("id") id: Long): Response<EventResponse>
+    @POST("events/{id}/likes")
+    suspend fun likeEventById(@Path("id") id: Long): Response<EventResponse>
+    @DELETE("events/{id}")
+    suspend fun removeEventById(@Path("id") id: Long): Response<Unit>
+    @DELETE("events/{id}/likes")
+    suspend fun dislikeEventById(@Path("id") id: Long): Response<EventResponse>
+    @POST("events/{id}/participants")
+    suspend fun partEventById(@Path("id") id: Long): Response<EventResponse>
+    @DELETE("events/{id}/participants")
+    suspend fun nonPartEventById(@Path("id") id: Long): Response<EventResponse>
+    @POST("events")
+    suspend fun saveEvent(@Body eventRequest: EventRequest): Response<EventResponse>
+    //==========Wall=============================================================
+    @GET("{author_id}/wall/")
+    suspend fun getWallById(@Path("author_id") author_id: Long): Response<List<PostResponse>>
+    //==========My Wall=============================================================
+    @GET("my/wall")
+    suspend fun getMyWall(): Response<List<PostResponse>>
 }

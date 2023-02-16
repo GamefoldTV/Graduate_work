@@ -21,8 +21,6 @@ import ru.netology.nework.dto.Post
 import ru.netology.nework.util.CompanionArg.Companion.textArg
 import ru.netology.nework.viewmodel.PostViewModel
 
-val coordinatesMoscow = Point(55.7522200, 37.6155600)
-
 @AndroidEntryPoint
 class FeedFragment : Fragment() {
     private val viewModel: PostViewModel by viewModels(

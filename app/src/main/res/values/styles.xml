@@ -32,6 +32,19 @@
         <item name="android:minHeight">@dimen/icon_button_min_size</item>
     </style>
 
+    <style name="Widget.AppTheme.PartButton" parent="Widget.MaterialComponents.Button.TextButton.Icon">
+        <item name="backgroundTint">@color/part_button_tint</item>
+        <item name="iconTint">@color/colorWhite</item>
+        <item name="android:minWidth">@dimen/icon_button_min_size</item>
+        <item name="android:minHeight">@dimen/icon_button_min_size</item>
+    </style>
+
+    <style name="Widget.AppTheme.DateTime" parent="Widget.MaterialComponents.Button.TextButton.Icon">
+        <item name="cardBackgroundColor">@color/part_button_tint</item>
+        <item name="android:minWidth">@dimen/icon_button_min_size</item>
+        <item name="android:minHeight">@dimen/icon_button_min_size</item>
+    </style>
+
     <style name="Widget.AppTheme.AppBar" parent="Widget.MaterialComponents.Button.TextButton.Icon">
         <item name="iconTint">@color/colorWhite</item>
         <item name="android:minWidth">@dimen/icon_button_min_size</item>

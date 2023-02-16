@@ -1,5 +1,6 @@
 package ru.netology.nework.model
 
+
 import ru.netology.nework.dto.Post
 
 data class FeedModel(

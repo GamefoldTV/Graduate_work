@@ -5,8 +5,10 @@ import ru.netology.nework.auth.AuthState
 import ru.netology.nework.dto.*
 
 interface PostRepository {
-    val data: Flow<List<Post>>
-    suspend fun getAll()
+    val posts: Flow<List<Post>>
+    val events: Flow<List<Event>>
+    val users: Flow<List<Users>>
+    suspend fun getPosts()
     suspend fun upload(upload: MediaRequest): MediaResponse
     suspend fun save(post: Post)
     suspend fun saveWithAttachment(post: Post, upload: MediaRequest)
@@ -20,6 +22,14 @@ interface PostRepository {
         name: String,
         avatar: MediaRequest
     ): AuthState
+    suspend fun getUsersByIds(ids : List<Long>) : List<Users>
+    suspend fun getUsers()
+    suspend fun getEvents()
+    suspend fun saveEvent(event: Event)
+    suspend fun saveEventWithAttachment(event: Event, upload: MediaRequest)
+    suspend fun likeEventById(id: Long, likedByMe: Boolean)
+    suspend fun removeEventById(id: Long)
+    suspend fun partEventById(id: Long, participatedByMe: Boolean)
 
 }
 

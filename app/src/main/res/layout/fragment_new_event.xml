@@ -22,6 +22,48 @@
             android:padding="@dimen/common_spacing">
 
             <TextView
+                android:id="@+id/text_datetime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/new_event_datetime" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+
+                <EditText
+                    android:id="@+id/editTextDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:enabled="false"
+                    android:inputType="date" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_changeDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/new_event_change_datetime" />
+
+                <EditText
+                    android:id="@+id/editTextTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:enabled="false"
+                    android:inputType="time" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_changeTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/new_event_change_datetime" />
+
+            </LinearLayout>
+
+            <TextView
                 android:id="@+id/text_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -49,6 +91,21 @@
                 android:inputType="textMultiLine"
                 android:padding="@dimen/common_spacing" />
 
+            <TextView
+                android:id="@+id/text_speakers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/new_event_speakers" />
+
+            <EditText
+                android:id="@+id/edit_speakers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:inputType="textMultiLine"
+                android:padding="@dimen/common_spacing" />
+
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -61,8 +118,7 @@
                     android:layout_height="wrap_content"
                     android:checkable="false"
                     app:icon="@drawable/ic_baseline_location_on_24"
-                    app:layout_constraintEnd_toEndOf="parent">
-                </com.google.android.material.button.MaterialButton>
+                    app:layout_constraintEnd_toEndOf="parent"></com.google.android.material.button.MaterialButton>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_location_off"
@@ -71,8 +127,7 @@
                     android:layout_height="match_parent"
                     android:checkable="false"
                     app:icon="@drawable/ic_baseline_location_off_24"
-                    app:layout_constraintEnd_toEndOf="parent">
-                </com.google.android.material.button.MaterialButton>
+                    app:layout_constraintEnd_toEndOf="parent"></com.google.android.material.button.MaterialButton>
 
                 <TextView
                     android:id="@+id/text_coord"
@@ -83,31 +138,27 @@
                 <TextView
                     android:id="@+id/text_coord_lat"
                     android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/common_spacing"
                     android:ellipsize="end"
-                    android:layout_height="wrap_content"
-                    tools:text="@sample/posts.json/data/coords"
-                     />
+                    tools:text="@sample/posts.json/data/coords" />
 
                 <TextView
                     android:id="@+id/text_coord_long"
                     android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/common_spacing"
                     android:ellipsize="end"
-                    android:layout_height="wrap_content"
-                    tools:text="@sample/posts.json/data/coords"
-                    />
-
-
+                    tools:text="@sample/posts.json/data/coords" />
 
 
             </LinearLayout>
 
             <FrameLayout
                 android:id="@+id/AttachmentContainer"
-                android:layout_marginTop="@dimen/common_spacing"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/common_spacing">
 
                 <ImageView
                     android:id="@+id/Attachment_Image"
@@ -120,7 +171,6 @@
                     tools:srcCompat="@tools:sample/avatars" />
 
 
-
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/removePhoto"
                     android:layout_width="wrap_content"
@@ -128,6 +178,7 @@
                     android:layout_gravity="center"
                     android:text="@string/remove" />
             </FrameLayout>
+
         </LinearLayout>
     </ScrollView>
 

@@ -7,7 +7,7 @@ import ru.netology.nework.entity.PostEntity
 @Dao
 interface PostDao {
     @Query("SELECT * FROM PostEntity ORDER BY id DESC")
-    fun getAll(): Flow<List<PostEntity>>
+    fun getPosts(): Flow<List<PostEntity>>
 
     @Query("SELECT COUNT(*) == 0 FROM PostEntity")
     suspend fun isEmpty(): Boolean
@@ -23,7 +23,6 @@ interface PostDao {
 
     @Query("DELETE FROM PostEntity WHERE id = :id")
     suspend fun removeById(id: Long)
-
 }
 
 

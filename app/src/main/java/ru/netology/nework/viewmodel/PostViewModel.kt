@@ -1,7 +1,6 @@
 package ru.netology.nework.viewmodel
 
 import android.net.Uri
-import androidx.core.net.toFile
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -10,10 +9,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.netology.nework.auth.AppAuth
-import ru.netology.nework.auth.LoginFormState
 import ru.netology.nework.dto.*
 import ru.netology.nework.dto.Post
-import ru.netology.nework.enumeration.AttachmentType
 import ru.netology.nework.model.FeedModel
 import ru.netology.nework.model.FeedModelState
 import ru.netology.nework.model.PhotoModel
@@ -43,7 +40,7 @@ class PostViewModel @Inject constructor(
 ) : ViewModel() {
   val data: LiveData<FeedModel> = auth.authStateFlow
         .flatMapLatest { (myId, _) ->
-            repository.data
+            repository.posts
                 .map{ posts ->
                     FeedModel(
                         posts.map { it.copy(ownedByMe = it.authorId == myId) },
@@ -56,9 +53,9 @@ class PostViewModel @Inject constructor(
     val dataState: LiveData<FeedModelState>
         get() = _dataState
 
-    private val _authState = MutableLiveData<LoginFormState>()
-    val authState: LiveData<LoginFormState>
-        get() = _authState
+  //  private val _authState = MutableLiveData<LoginFormState>()
+  //  val authState: LiveData<LoginFormState>
+  //      get() = _authState
 
     private val editedPost = MutableLiveData(empty)
 
@@ -81,7 +78,7 @@ class PostViewModel @Inject constructor(
     fun loadPosts() = viewModelScope.launch {
         try {
             _dataState.value = FeedModelState(loading = true)
-            repository.getAll()
+            repository.getPosts()
             _dataState.value = FeedModelState()
         } catch (e: Exception) {
             _dataState.value = FeedModelState(error = true)
@@ -91,7 +88,7 @@ class PostViewModel @Inject constructor(
     fun refreshPosts() = viewModelScope.launch {
         try {
             _dataState.value = FeedModelState(refreshing = true)
-            repository.getAll()
+            repository.getPosts()
             _dataState.value = FeedModelState()
         } catch (e: Exception) {
             _dataState.value = FeedModelState(error = true)

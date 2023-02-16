@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeWork</string>
-    <string name="hello">Привет, Мир!</string>
     <string name="description_post_author_avatar">Аватар автора поста</string>
     <string name="description_post_menu">Меню поста</string>
     <string name="description_post_like">Нравится</string>
@@ -15,7 +14,7 @@
     <string name="chooser_share_post">Поделиться</string>
     <string name="add_post">Добавить пост</string>
     <string name="retry_loading">Повторить</string>
-    <string name="empty_posts">Постов нет.\nЕсли создадите новый пост, то он появится здесь</string>
+    <string name="empty_posts">Постов нет. Если создадите новый пост, то он появится здесь</string>
     <string name="error_loading">Не удалось загрузить данные</string>
     <string name="save">Сохранить</string>
     <string name="google_play_unavailable">Google Api Недоступно</string>
@@ -29,7 +28,7 @@
     <string name="new_posts">Свежие новости</string>
     <string name="sign_in">Вход</string>
     <string name="sign_up">Регистрация</string>
-    <string name="sign_out">Выход</string>
+    <string name="main_menu_sign_out">Выход</string>
     <string name="login_login">Логин</string>
     <string name="login_password">Пароль</string>
     <string name="action_sign_in">Войти или зарегистрироваться</string>
@@ -40,4 +39,17 @@
     <string name="new_post_coords">Местоположение:</string>
     <string name="login_register">Регистрация</string>
     <string name="login_name">Имя</string>
+    <string name="main_menu_events">Мероприятия</string>
+    <string name="empty_events">Мероприятий нет. Если создадите новые мероприятие, то он появится здесь</string>
+    <string name="latitude">Широта:</string>
+    <string name="longitude">Долгота:</string>
+    <string name="main_menu_wall">Стена</string>
+    <string name="header_posts">Посты</string>
+    <string name="header_events">Мероприятия</string>
+    <string name="button_part">Участвую</string>
+    <string name="button_nonpart">Участвовать</string>
+    <string name="new_event_datetime">Дата и время мероприятия</string>
+    <string name="new_event_change_datetime">Изменить</string>
+    <string name="new_event_speakers">Ораторы:</string>
+    <string name="main_menu_posts">Посты:</string>
 </resources>
