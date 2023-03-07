@@ -17,12 +17,12 @@ import ru.netology.nework.adapter.EventAdapter
 import ru.netology.nework.adapter.OnInteractionEventListener
 import ru.netology.nework.databinding.FragmentEventFeedBinding
 import ru.netology.nework.dto.Event
-import ru.netology.nework.viewmodel.EventViewModel
+import ru.netology.nework.viewmodel.PostViewModel
 
 
 @AndroidEntryPoint
 class FeedEventFragment : Fragment() {
-    private val viewModel: EventViewModel by viewModels(
+    private val viewModel: PostViewModel by viewModels(
         ownerProducer = ::requireParentFragment,
     )
 
@@ -35,21 +35,21 @@ class FeedEventFragment : Fragment() {
 
         val adapter = EventAdapter(object : OnInteractionEventListener {
             override fun onEdit(event: Event) {
-                viewModel.edit(event)
+                viewModel.editEvent(event)
                 findNavController().navigate(R.id.action_feedEventFragment_to_newEventFragment)
             }
 
             override fun onLike(event: Event) {
-                viewModel.likeById(event.id, event.likedByMe)
+                viewModel.likeEventById(event.id, event.likedByMe)
             }
 
             override fun onRemove(event: Event) {
-                viewModel.removeById(event.id)
+                viewModel.removeEventById(event.id)
 
             }
 
             override fun onParticipate(event: Event) {
-                viewModel.part(event.id, event.participatedByMe)
+                viewModel.participate(event.id, event.participatedByMe)
             }
 
             override fun onPreviewMap(event: Event) {
@@ -73,14 +73,13 @@ class FeedEventFragment : Fragment() {
                     .show()
             }
         }
-        viewModel.data.observe(viewLifecycleOwner) { state ->
+        viewModel.dataEvents.observe(viewLifecycleOwner) { state ->
             adapter.submitList(state.events)
             binding.emptyText.isVisible = state.empty
         }
 
-
         binding.swiperefresh.setOnRefreshListener {
-            viewModel.refreshPosts()
+            viewModel.refreshEvents()
         }
 
         binding.fab.setOnClickListener {

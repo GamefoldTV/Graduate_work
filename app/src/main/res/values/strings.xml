@@ -52,4 +52,6 @@
     <string name="new_event_datetime">Date and time of the event</string>
     <string name="new_event_change_datetime">Change</string>
     <string name="new_event_speakers">Speakers:</string>
+    <string name="new_post_online">ONLINE</string>
+    <string name="new_post_offline">OFFLINE</string>
 </resources>

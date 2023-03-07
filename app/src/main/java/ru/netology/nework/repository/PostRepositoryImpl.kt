@@ -163,7 +163,6 @@ class PostRepositoryImpl @Inject constructor(
     override suspend fun saveWithAttachment(post: Post, upload: MediaRequest) {
         try {
             val media = upload(upload)
-            // TODO: add support for other types
             val postWithAttachment =
                 post.copy(attachment = Attachment(media.url, AttachmentType.IMAGE))
             save(postWithAttachment)
@@ -321,7 +320,11 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getUsersByIds(ids: List<Long>): List<Users> {
-        TODO("Not yet implemented")
+        val userList = ids.map {
+            userdao.getUserById(it)
+        }
+        return userList
+            .map(UserEntity::toDto)
     }
 
     override suspend fun getEvents() {

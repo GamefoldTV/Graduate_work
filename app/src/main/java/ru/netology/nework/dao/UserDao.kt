@@ -12,6 +12,12 @@ interface UserDao {
     @Query("SELECT * FROM UserEntity ORDER BY id DESC")
     fun getUsers(): Flow<List<UserEntity>>
 
+    @Query("SELECT * FROM UserEntity WHERE id = :id")
+    fun getUserById(id: Long): UserEntity
+
+    @Query("DELETE FROM PostEntity WHERE id = :id")
+    suspend fun removeById(id: Long)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(user: UserEntity)
 
@@ -21,8 +27,6 @@ interface UserDao {
     @Query("DELETE FROM UserEntity")
     suspend fun clear()
 
- //   @Query("SELECT * FROM UserEntity WHERE id = :id")
- //   suspend fun findUsersById(id: Long) : Flow<UserEntity>
 }
 
 

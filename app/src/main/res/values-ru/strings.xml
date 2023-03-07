@@ -52,4 +52,6 @@
     <string name="new_event_change_datetime">Изменить</string>
     <string name="new_event_speakers">Ораторы:</string>
     <string name="main_menu_posts">Посты:</string>
+    <string name="new_post_online">ONLINE</string>
+    <string name="new_post_offline">OFFLINE</string>
 </resources>

@@ -77,7 +77,7 @@ class MapsNewMarkerFragment : Fragment(), UserLocationObjectListener, CameraList
                         Snackbar.make(it.root, "Data id empty", Snackbar.LENGTH_LONG)
                             .show()
                     } else {
-                        viewModel.changeCoords(
+                        viewModel.changeCoordsPosts(
                             it.editLatitude.text.toString(),
                             it.editLongitude.text.toString()
                         )

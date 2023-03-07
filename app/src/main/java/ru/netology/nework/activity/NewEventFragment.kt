@@ -21,15 +21,16 @@ import ru.netology.nework.R
 import ru.netology.nework.activity.MapsNewMarkerFragment.Companion.latArg
 import ru.netology.nework.activity.MapsNewMarkerFragment.Companion.longArg
 import ru.netology.nework.databinding.FragmentNewEventBinding
+import ru.netology.nework.enumeration.EventType
 import ru.netology.nework.util.AndroidUtils
 import ru.netology.nework.view.load
-import ru.netology.nework.viewmodel.EventViewModel
+import ru.netology.nework.viewmodel.PostViewModel
 import java.util.*
 
 
 @AndroidEntryPoint
 class NewEventFragment : Fragment() {
-    private val viewModel: EventViewModel by viewModels(
+    private val viewModel: PostViewModel by viewModels(
         ownerProducer = ::requireParentFragment,
     )
 
@@ -48,17 +49,20 @@ class NewEventFragment : Fragment() {
         return when (item.itemId) {
             R.id.save -> {
                 fragmentBinding?.let {
-                    viewModel.changeDateTime(
+                    viewModel.changeDateTimeEvent(
                         it.editTextDate.text.toString(),
                         it.editTextTime.text.toString()
                     )
-                    viewModel.changeContent(it.editContent.text.toString())
-                    viewModel.changeLink(it.editLink.text.toString())
-                    viewModel.changeCoords(
-                        viewModel.coords.value?.lat,
-                        viewModel.coords.value?.long
+                    viewModel.changeContentEvent(it.editContent.text.toString())
+                    viewModel.changeLinkEvent(it.editLink.text.toString())
+                    viewModel.changeCoordsEvent(
+                      //  viewModel.coords.value?.lat,
+                      //  viewModel.coords.value?.long
+                        it.textCoordLat.text.toString(),
+                        it.textCoordLong.text.toString()
                     )
-                    viewModel.changeSpeakers(it.editSpeakers.text.toString())
+                    viewModel.changeSpeakersEvent(it.editSpeakers.text.toString())
+                    viewModel.changeTypeEvent(it.radioOnline.isChecked)
                     viewModel.saveEvent()
                     AndroidUtils.hideKeyboard(requireView())
                 }
@@ -81,14 +85,14 @@ class NewEventFragment : Fragment() {
         fragmentBinding = binding
 
 
-        val editPost = viewModel.getEditEvent()
-        binding.editContent.setText(editPost?.content)
-        binding.editLink.setText(editPost?.link)
-        val lat = editPost?.coords?.lat
-        val long = editPost?.coords?.long
+        val editEvent = viewModel.getEditEvent()
+        binding.editContent.setText(editEvent?.content)
+        binding.editLink.setText(editEvent?.link)
+        val lat = editEvent?.coords?.lat
+        val long = editEvent?.coords?.long
         if (lat != null && long != null)
             viewModel.changeCoordsFromMap(lat, long)
-        val attachment = editPost?.attachment
+        val attachment = editEvent?.attachment
         if (attachment != null) viewModel.changePhoto(Uri.parse(attachment.url), null)
         if (attachment?.url != null) {
             binding.AttachmentImage.load(attachment.url)
@@ -112,8 +116,7 @@ class NewEventFragment : Fragment() {
         val timeSetListener = TimePickerDialog.OnTimeSetListener { view, hour, minute ->
             cal.set(Calendar.HOUR_OF_DAY, hour)
             cal.set(Calendar.MINUTE, minute)
-            //   DateFormat.is24HourFormat(binding.root.context)
-            val myFormat = "HH:mm" // mention the format you need
+            val myFormat = "HH:mm"
             val sdf = SimpleDateFormat(myFormat, Locale.getDefault())
             binding.editTextTime.setText(sdf.format(cal.time))
         }
@@ -135,6 +138,9 @@ class NewEventFragment : Fragment() {
                 DateFormat.is24HourFormat(binding.root.context)
             ).show()
         }
+
+        binding.radioOnline.isChecked = editEvent?.type == EventType.ONLINE
+        binding.radioOffline.isChecked = editEvent?.type == EventType.OFFLINE
 
         binding.editContent.requestFocus()
 
@@ -192,7 +198,7 @@ class NewEventFragment : Fragment() {
 
         binding.buttonLocationOff.setOnClickListener {
             viewModel.changeCoordsFromMap("", "")
-            viewModel.changeCoords("", "")
+            viewModel.changeCoordsEvent("", "")
         }
 
 
@@ -211,7 +217,6 @@ class NewEventFragment : Fragment() {
                 binding.AttachmentContainer.visibility = View.GONE
                 return@observe
             }
-            // загрузили новый аттач
             binding.AttachmentContainer.visibility = View.VISIBLE
             binding.AttachmentImage.setImageURI(it.uri)
         }

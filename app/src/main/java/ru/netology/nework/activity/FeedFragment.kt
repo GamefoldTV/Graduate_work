@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
-import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nework.R
 import ru.netology.nework.activity.MapsPreviewFragment.Companion.doubleArg1
@@ -36,16 +35,16 @@ class FeedFragment : Fragment() {
 
         val adapter = PostsAdapter(object : OnInteractionListener {
             override fun onEdit(post: Post) {
-                viewModel.edit(post)
+                viewModel.editPosts(post)
                 findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
             }
 
             override fun onLike(post: Post) {
-                viewModel.likeById(post.id)
+                viewModel.likePostById(post.id)
             }
 
             override fun onRemove(post: Post) {
-                viewModel.removeById(post.id)
+                viewModel.removePostById(post.id)
 
             }
 
@@ -77,7 +76,7 @@ class FeedFragment : Fragment() {
                     .show()
             }
         }
-        viewModel.data.observe(viewLifecycleOwner) { state ->
+        viewModel.dataPosts.observe(viewLifecycleOwner) { state ->
             adapter.submitList(state.posts)
             binding.emptyText.isVisible = state.empty
         }

@@ -74,12 +74,15 @@ class EventViewHolder(
             else avatar.setImageResource(R.mipmap.ic_avatar_1_round)
 
             val speakersIds = event.speakerIds?.map {
-            //    repository.users.map {
+             //   repository.users.map {
 
             //    }
             }
 
-            speakers.text =  speakersIds.toString()
+            speakers.text =  event.speakerIds?.map {
+                it.toString()
+            }.toString()
+                //speakersIds.toString()
 
             buttonLike.isChecked = event.likedByMe
             buttonParticipate.isChecked = event.participatedByMe

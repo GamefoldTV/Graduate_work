@@ -8,4 +8,5 @@
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorCardSurface">#F4DCF8</color>
     <color name="colorNull">#fafafa</color>
+    <color name="colorType">#E6DAF7</color>
 </resources>

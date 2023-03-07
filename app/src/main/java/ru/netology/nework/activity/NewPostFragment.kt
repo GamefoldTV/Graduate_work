@@ -43,13 +43,15 @@ class NewPostFragment : Fragment() {
         return when (item.itemId) {
             R.id.save -> {
                 fragmentBinding?.let {
-                    viewModel.changeContent(it.editContent.text.toString())
-                    viewModel.changeLink(it.editLink.text.toString())
-                    viewModel.changeCoords(
-                        viewModel.coords.value?.lat,
-                        viewModel.coords.value?.long
+                    viewModel.changeContentPosts(it.editContent.text.toString())
+                    viewModel.changeLinkPosts(it.editLink.text.toString())
+                    viewModel.changeCoordsPosts(
+                        //  viewModel.coords.value?.lat,
+                        //  viewModel.coords.value?.long
+                        it.textCoordLat.text.toString(),
+                        it.textCoordLong.text.toString()
                     )
-                    viewModel.save()
+                    viewModel.savePosts()
                     AndroidUtils.hideKeyboard(requireView())
                 }
                 true
@@ -140,9 +142,8 @@ class NewPostFragment : Fragment() {
 
         binding.buttonLocationOff.setOnClickListener {
             viewModel.changeCoordsFromMap("", "")
-            viewModel.changeCoords("", "")
+            viewModel.changeCoordsPosts("", "")
         }
-
 
         viewModel.postCreated.observe(viewLifecycleOwner) {
             findNavController().navigateUp()
@@ -159,7 +160,6 @@ class NewPostFragment : Fragment() {
                 binding.AttachmentContainer.visibility = View.GONE
                 return@observe
             }
-            // загрузили новый аттач
             binding.AttachmentContainer.visibility = View.VISIBLE
             binding.AttachmentImage.setImageURI(it.uri)
         }

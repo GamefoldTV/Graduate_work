@@ -118,7 +118,9 @@
                     android:layout_height="wrap_content"
                     android:checkable="false"
                     app:icon="@drawable/ic_baseline_location_on_24"
-                    app:layout_constraintEnd_toEndOf="parent"></com.google.android.material.button.MaterialButton>
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                </com.google.android.material.button.MaterialButton>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_location_off"
@@ -127,7 +129,9 @@
                     android:layout_height="match_parent"
                     android:checkable="false"
                     app:icon="@drawable/ic_baseline_location_off_24"
-                    app:layout_constraintEnd_toEndOf="parent"></com.google.android.material.button.MaterialButton>
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                </com.google.android.material.button.MaterialButton>
 
                 <TextView
                     android:id="@+id/text_coord"
@@ -150,9 +154,34 @@
                     android:layout_marginStart="@dimen/common_spacing"
                     android:ellipsize="end"
                     tools:text="@sample/posts.json/data/coords" />
-
-
             </LinearLayout>
+
+            <RadioGroup
+                android:id="@+id/radioGroup_typeEvent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorType"
+
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radio_online"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/new_post_online"
+                    android:layout_marginLeft="24dp"
+                    android:layout_weight="1"
+                    android:checked="true"
+                     />
+
+                <RadioButton
+                    android:id="@+id/radio_offline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="24dp"
+                    android:layout_weight="1"
+                    android:text="@string/new_post_offline"/>
+            </RadioGroup>
 
             <FrameLayout
                 android:id="@+id/AttachmentContainer"

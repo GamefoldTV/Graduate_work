@@ -158,7 +158,6 @@
 
         </FrameLayout>
 
-
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/footer"
             android:layout_width="wrap_content"
