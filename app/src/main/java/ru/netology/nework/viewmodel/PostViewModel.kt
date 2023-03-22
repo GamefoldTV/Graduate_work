@@ -9,15 +9,9 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.netology.nework.auth.AppAuth
-import ru.netology.nework.dto.Coordinates
-import ru.netology.nework.dto.Event
-import ru.netology.nework.dto.MediaRequest
-import ru.netology.nework.dto.Post
+import ru.netology.nework.dto.*
 import ru.netology.nework.enumeration.EventType
-import ru.netology.nework.model.EventFeedModel
-import ru.netology.nework.model.FeedModel
-import ru.netology.nework.model.FeedModelState
-import ru.netology.nework.model.PhotoModel
+import ru.netology.nework.model.*
 import ru.netology.nework.repository.PostRepository
 import ru.netology.nework.util.SingleLiveEvent
 import ru.netology.nework.util.convertDateTime2ISO_Instant
@@ -47,6 +41,15 @@ private val emptyEvent = Event(
     ownedByMe = false
 )
 
+private val emptyJob = Job(
+    userId = 0,
+    id = 0,
+    name = "",
+    position = "",
+    start = "",
+)
+
+
 private val noPhoto = PhotoModel()
 private val noCoords = Coordinates()
 
@@ -57,6 +60,17 @@ class PostViewModel @Inject constructor(
     private val auth: AppAuth,
 ) : ViewModel() {
     val dataPosts: LiveData<FeedModel> = auth.authStateFlow
+        .flatMapLatest { (myId, _) ->
+            repository.posts
+                .map { posts ->
+                    FeedModel(
+                        posts.map { it.copy(ownedByMe = it.authorId == myId) },
+                        posts.isEmpty()
+                    )
+                }
+        }.asLiveData(Dispatchers.Default)
+
+    val dataPostsWall: LiveData<FeedModel> = auth.authStateFlow
         .flatMapLatest { (myId, _) ->
             repository.posts
                 .map { posts ->
@@ -78,6 +92,19 @@ class PostViewModel @Inject constructor(
                 }
         }.asLiveData(Dispatchers.Default)
 
+    val dataMyJobs: LiveData<JobFeedModel> = auth.authStateFlow
+        .flatMapLatest { (myId, _) ->
+            repository.jobs
+                .map { job ->
+                    JobFeedModel(
+                        //    job.map {
+                        //       it.copy(ownedByMe = it.userId == myId) },
+                        job.filter { it.userId == myId },
+                        job.isEmpty()
+                    )
+                }
+        }.asLiveData(Dispatchers.Default)
+
     private val _dataState = MutableLiveData<FeedModelState>()
     val dataState: LiveData<FeedModelState>
         get() = _dataState
@@ -93,6 +120,12 @@ class PostViewModel @Inject constructor(
     private val _eventCreated = SingleLiveEvent<Unit>()
     val eventCreated: LiveData<Unit>
         get() = _eventCreated
+
+    private val editedJob = MutableLiveData(emptyJob)
+
+    private val _jobCreated = SingleLiveEvent<Unit>()
+    val jobCreated: LiveData<Unit>
+        get() = _jobCreated
 
     private val _photo = MutableLiveData(noPhoto)
     val photo: LiveData<PhotoModel>
@@ -146,9 +179,6 @@ class PostViewModel @Inject constructor(
                                     MediaRequest(_photo.value?.file!!)
                                 )
                             else repository.save(post)
-                        //                           _photo.value?.file?.let { file ->
-                        // repository.saveWithAttachment(post, MediaRequest(file))
-
                     }
                     _dataState.value = FeedModelState()
                 } catch (e: Exception) {
@@ -183,6 +213,18 @@ class PostViewModel @Inject constructor(
             return
         }
         editedPost.value = editedPost.value?.copy(link = text)
+    }
+
+    fun changeMentionList(mentionList: String) {
+        if (mentionList.isNotEmpty())
+            try {
+                val mentionIds = mentionList.split(",").map {
+                    it.trim().toLong()
+                }
+                editedPost.value = editedPost.value?.copy(mentionIds = mentionIds)
+            } catch (e: Exception) {
+                _dataState.value = FeedModelState(error = true)
+            }
     }
 
     fun changeCoordsPosts(lat: String?, long: String?) {
@@ -368,6 +410,101 @@ class PostViewModel @Inject constructor(
     fun participate(id: Long, participatedByMe: Boolean) = viewModelScope.launch {
         try {
             repository.partEventById(id, participatedByMe)
+        } catch (e: Exception) {
+            _dataState.value = FeedModelState(error = true)
+        }
+    }
+
+    fun loadJobs(userId: Long) = viewModelScope.launch {
+        try {
+            _dataState.value = FeedModelState(loading = true)
+            repository.getJobs(userId)
+            _dataState.value = FeedModelState()
+        } catch (e: Exception) {
+            _dataState.value = FeedModelState(error = true)
+        }
+    }
+
+    fun getCurrentUser(): Long {
+        return auth.authStateFlow.value.id
+    }
+
+    fun getEditJob(): Job? {
+        return editedJob.value
+    }
+
+    fun editJob(job: Job) {
+        editedJob.value = job
+    }
+
+    fun saveJob(userId: Long) {
+        editedJob.value?.let { job ->
+            _jobCreated.value = Unit
+            viewModelScope.launch {
+                try {
+                    repository.saveJob(userId, job)
+                    _dataState.value = FeedModelState()
+                } catch (e: Exception) {
+                    _dataState.value = FeedModelState(error = true)
+                }
+            }
+        }
+        editedJob.value = emptyJob
+    }
+
+    fun changeJobStart(start: String) {
+        val dateStart = convertDateTime2ISO_Instant(start, "00:00")
+        editedJob.value = editedJob.value?.copy(start = dateStart)
+    }
+
+    fun changeJobFinish(finish: String) {
+        val finishStr =
+            if (finish.isNotEmpty()) convertDateTime2ISO_Instant(finish, "00:00") else null
+        editedJob.value = editedJob.value?.copy(finish = finishStr)
+    }
+
+    fun changeNameJob(name: String) {
+        val text = name.trim()
+        if (editedJob.value?.name == text) {
+            return
+        }
+        editedJob.value = editedJob.value?.copy(name = text)
+    }
+
+    fun changePositionJob(position: String) {
+        val text = position.trim()
+        if (editedJob.value?.name == text) {
+            return
+        }
+        editedJob.value = editedJob.value?.copy(position = text)
+    }
+
+    fun changeLinkJob(link: String) {
+        val text = if (link.isEmpty())
+            null
+        else
+            link.trim()
+
+        if (editedJob.value?.link == text) {
+            return
+        }
+        editedJob.value = editedJob.value?.copy(link = text)
+    }
+
+
+    fun removeJobById(id: Long) = viewModelScope.launch {
+        try {
+            repository.removeJobById(id)
+        } catch (e: Exception) {
+            _dataState.value = FeedModelState(error = true)
+        }
+    }
+
+    fun refreshJobs(userId: Long) = viewModelScope.launch {
+        try {
+            _dataState.value = FeedModelState(refreshing = true)
+            repository.getJobs(userId)
+            _dataState.value = FeedModelState()
         } catch (e: Exception) {
             _dataState.value = FeedModelState(error = true)
         }

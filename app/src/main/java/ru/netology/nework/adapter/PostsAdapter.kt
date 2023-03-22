@@ -11,11 +11,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.netology.nework.R
-import ru.netology.nework.dao.Converters
 import ru.netology.nework.databinding.CardPostBinding
 import ru.netology.nework.dto.Post
 import ru.netology.nework.enumeration.AttachmentType
-import ru.netology.nework.util.convertString2Date2String
+import ru.netology.nework.util.convertString2DateTime2String
 import ru.netology.nework.view.load
 import ru.netology.nework.view.loadCircleCrop
 
@@ -57,7 +56,7 @@ class PostViewHolder(
                 authorJob.text = post.authorJob
                 authorJob.visibility = View.VISIBLE
             }
-            published.text = convertString2Date2String(post.published)
+            published.text = convertString2DateTime2String(post.published)
 
             content.text = post.content
 
@@ -70,6 +69,15 @@ class PostViewHolder(
             buttonLike.isChecked = post.likedByMe
 
             buttonMap.isVisible = post.coords != null
+
+            if (post.mentionIds?.isEmpty() == true) {
+                mentions.visibility = View.GONE
+                mentionsInfo.visibility = View.GONE
+            } else {
+                mentions.visibility = View.VISIBLE
+                mentionsInfo.visibility = View.VISIBLE
+                mentions.text = post.mentionList?.joinToString(", ", "", "", 10, "...", null)
+            }
 
             when (post.attachment?.type) {
                 AttachmentType.IMAGE -> {

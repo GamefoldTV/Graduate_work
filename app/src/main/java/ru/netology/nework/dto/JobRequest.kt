@@ -1,11 +1,10 @@
 package ru.netology.nework.dto
 
-data class Job(
-    val userId : Long,
+data class JobRequest(
     val id : Long,
     val name : String,
     val position : String,
     val start : String,
-    val finish : String? = null,
-    val link : String? = null,
+    val finish : String?,
+    val link : String?
 )

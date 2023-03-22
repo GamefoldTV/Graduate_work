@@ -24,6 +24,8 @@ data class PostEntity(
     val likeOwnerIds:  List<Long>?,
     @TypeConverters(Converters::class)
     val mentionIds:  List<Long>?,
+    @TypeConverters(Converters::class)
+    val mentionList : List<String>?,
     val mentionedMe: Boolean = false,
     val likedByMe: Boolean = false,
     @Embedded
@@ -43,6 +45,7 @@ data class PostEntity(
         link,
         likeOwnerIds,
         mentionIds,
+        mentionList,
         mentionedMe,
         likedByMe,
         attachment?.toDto(),
@@ -63,6 +66,7 @@ data class PostEntity(
                 dto.link,
                 dto.likeOwnerIds,
                 dto.mentionIds,
+                dto.mentionList,
                 dto.mentionedMe,
                 dto.likedByMe,
                 AttachmentEmbeddable.fromDto(dto.attachment),
@@ -71,7 +75,5 @@ data class PostEntity(
     }
 }
 
-
 fun List<PostEntity>.toDto(): List<Post> = map(PostEntity::toDto)
 fun List<Post>.toEntity(): List<PostEntity> = map(PostEntity::fromDto)
-

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/common_spacing">
+
+        <ImageView
+            android:id="@+id/avatar"
+            android:layout_width="@dimen/posts_avatar_size"
+            android:layout_height="@dimen/posts_avatar_size"
+            android:layout_marginBottom="@dimen/common_spacing"
+            app:layout_constraintBottom_toBottomOf="@id/header"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@mipmap/ic_avatar_1"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:id="@+id/author"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/common_spacing"
+            android:ellipsize="end"
+            android:singleLine="true"
+            app:layout_constraintBottom_toTopOf="@+id/authorJob"
+            app:layout_constraintEnd_toStartOf="@+id/menu"
+            app:layout_constraintStart_toEndOf="@id/avatar"
+            app:layout_constraintTop_toTopOf="@+id/avatar"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="@sample/posts.json/data/author" />
+
+        <TextView
+            android:id="@+id/authorJob"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/common_spacing"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/avatar"
+            app:layout_constraintEnd_toStartOf="@+id/menu"
+            app:layout_constraintStart_toEndOf="@id/avatar"
+            app:layout_constraintTop_toBottomOf="@+id/author"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="@sample/posts.json/data/authorJob" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/common_spacing"
+            android:contentDescription="@string/description_post_menu"
+            app:icon="@drawable/ic_more_vert_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            style="@style/Widget.AppTheme.IconButton"
+            />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="avatar, menu, authorJob"
+            tools:layout_editor_absoluteX="16dp"
+            tools:layout_editor_absoluteY="80dp" />
+
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="@dimen/common_spacing"
+            android:layout_marginEnd="@dimen/common_spacing"
+            android:background="@color/divider_color"
+            app:layout_constraintBottom_toTopOf="@id/swiperefresh"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/header" />
+
+        <TextView
+            android:id="@+id/emptyText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_posts"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swiperefresh"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/divider"
+            tools:layout_editor_absoluteX="16dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/card_wall_post" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:clickable="true"
+        android:contentDescription="@string/add_post"
+        android:focusable="true"
+        android:layout_gravity="bottom|end"
+        app:srcCompat="@drawable/ic_add_24dp" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+

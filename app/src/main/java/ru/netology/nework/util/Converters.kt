@@ -18,9 +18,15 @@ fun convertCount2String(count: Long): String {
     return result
 }
 
-fun convertString2Date2String(dateString: String): String {
+fun convertString2DateTime2String(dateString: String): String {
     val string2date = Date.from(Instant.from(DateTimeFormatter.ISO_INSTANT.parse(dateString)))
     val date2string = SimpleDateFormat("dd MMMM yyyy HH:mm").format(string2date)
+    return date2string
+}
+
+fun convertString2Date2String(dateString: String): String {
+    val string2date = Date.from(Instant.from(DateTimeFormatter.ISO_INSTANT.parse(dateString)))
+    val date2string = SimpleDateFormat("dd MMMM yyyy").format(string2date)
     return date2string
 }
 

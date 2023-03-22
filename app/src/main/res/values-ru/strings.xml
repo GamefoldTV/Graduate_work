@@ -50,8 +50,23 @@
     <string name="button_nonpart">Участвовать</string>
     <string name="new_event_datetime">Дата и время мероприятия</string>
     <string name="new_event_change_datetime">Изменить</string>
-    <string name="new_event_speakers">Ораторы:</string>
+    <string name="event_speakers">Докладчики:</string>
     <string name="main_menu_posts">Посты:</string>
     <string name="new_post_online">ONLINE</string>
     <string name="new_post_offline">OFFLINE</string>
+    <string name="event_participants">Участники:</string>
+    <string name="post_mentions">Упомянуты:</string>
+    <string name="main_menu_jobs">Место работы</string>
+    <string name="header_jobs">Место работы</string>
+    <string name="empty_jobs">Места работы не указаны. Если создадите новые, то они появятся здесь</string>
+    <string name="new_job_start">Дата начала:</string>
+    <string name="new_job_finish">Дата заврешения:</string>
+    <string name="new_job_name">Название организации:</string>
+    <string name="new_job_position">Позиция:</string>
+    <string name="new_job_link">Ссылка:</string>
+    <string name="new_job_changeDate">Изменить</string>
+    <string name="new_post_empty_content">Вам необходимо заполнить содержимое поста</string>
+    <string name="new_event_empty_content">Вам необходимо заполнить содержимое события</string>
+    <string name="new_job_empty_name">Вам необходимо заполнить название организации</string>
+    <string name="new_job_empty_position">Вам необходимо заполнить должность</string>
 </resources>

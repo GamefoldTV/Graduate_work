@@ -14,6 +14,10 @@
         android:title="@string/main_menu_posts"
         app:showAsAction="never" />
     <item
+        android:id="@+id/jobs"
+        android:title="@string/main_menu_jobs"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/signout"
         android:title="@string/main_menu_sign_out"
         app:showAsAction="never" />

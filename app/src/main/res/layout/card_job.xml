@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/Widget.AppTheme.CardView"
+    >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/common_spacing">
+
+        <TextView
+            android:id="@+id/start_finish"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@+id/menu"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="01-01-2023 - 28-02-2023" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/common_spacing"
+            app:layout_constraintEnd_toEndOf="@+id/start_finish"
+            app:layout_constraintStart_toStartOf="@+id/start_finish"
+            app:layout_constraintTop_toBottomOf="@+id/start_finish"
+            tools:text="@sample/jobs.json/data/name" />
+
+        <TextView
+            android:id="@+id/position"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@+id/start_finish"
+            app:layout_constraintStart_toStartOf="@+id/name"
+            app:layout_constraintTop_toBottomOf="@+id/name"
+
+            tools:text="@sample/jobs.json/data/position" />
+
+        <TextView
+            android:id="@+id/link"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:autoLink="web"
+            app:layout_constraintEnd_toEndOf="@+id/start_finish"
+            app:layout_constraintStart_toStartOf="@+id/name"
+            app:layout_constraintTop_toBottomOf="@+id/position"
+            tools:text="@sample/jobs.json/data/link" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/common_spacing"
+            app:icon="@drawable/ic_more_vert_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            style="@style/Widget.AppTheme.IconButton"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

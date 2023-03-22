@@ -4,6 +4,7 @@ import android.app.Activity
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toFile
 import androidx.fragment.app.Fragment
@@ -32,7 +33,7 @@ class NewPostFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true) // сообщаем о наличии меню
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -43,16 +44,27 @@ class NewPostFragment : Fragment() {
         return when (item.itemId) {
             R.id.save -> {
                 fragmentBinding?.let {
-                    viewModel.changeContentPosts(it.editContent.text.toString())
-                    viewModel.changeLinkPosts(it.editLink.text.toString())
-                    viewModel.changeCoordsPosts(
-                        //  viewModel.coords.value?.lat,
-                        //  viewModel.coords.value?.long
-                        it.textCoordLat.text.toString(),
-                        it.textCoordLong.text.toString()
-                    )
-                    viewModel.savePosts()
-                    AndroidUtils.hideKeyboard(requireView())
+                    if (it.editContent.text.toString().isNotEmpty()) {
+                        viewModel.changeContentPosts(it.editContent.text.toString())
+                        viewModel.changeLinkPosts(it.editLink.text.toString())
+                        viewModel.changeMentionList(it.editMentions.text.toString())
+                        viewModel.changeCoordsPosts(
+                            it.textCoordLat.text.toString(),
+                            it.textCoordLong.text.toString()
+                        )
+                        viewModel.savePosts()
+                        AndroidUtils.hideKeyboard(requireView())
+                    }
+                    else
+                    {
+                        Toast.makeText(
+                            context,
+                            getString(R.string.new_post_empty_content),
+                            Toast.LENGTH_LONG
+                        )
+                            .show()
+                        it.editContent.requestFocus()
+                    }
                 }
                 true
             }
@@ -72,10 +84,16 @@ class NewPostFragment : Fragment() {
         )
         fragmentBinding = binding
 
-
         val editPost = viewModel.getEditPost()
         binding.editContent.setText(editPost?.content)
         binding.editLink.setText(editPost?.link)
+        binding.editMentions.setText(editPost?.mentionList?.joinToString(", ",
+            "",
+            "",
+            -1,
+            "...",
+            null))
+
         val lat = editPost?.coords?.lat
         val long = editPost?.coords?.long
         if (lat!=null && long!=null)

@@ -17,11 +17,26 @@ class Converters {
     }
 
     @TypeConverter
+    fun fromListStringDto(list: List<String>?): String? {
+        if (list == null) return ""
+        return list.toString()
+    }
+
+    @TypeConverter
     fun toListDto(data: String?): List<Long>? {
         if (data == "[]") return emptyList<Long>()
         else {
             val substr = data?.substring(1, data.length - 1)
             return substr?.split(", ")?.map { it.toLong() }
+        }
+    }
+
+    @TypeConverter
+    fun toListStringDto(data: String?): List<String>? {
+        if (data == "[]") return emptyList<String>()
+        else {
+            val substr = data?.substring(1, data.length - 1)
+            return substr?.split(", ")?.map { it.toString() }
         }
     }
 }

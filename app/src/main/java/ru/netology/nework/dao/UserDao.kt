@@ -12,9 +12,9 @@ interface UserDao {
     @Query("SELECT * FROM UserEntity ORDER BY id DESC")
     fun getUsers(): Flow<List<UserEntity>>
 
-    @Query("SELECT * FROM UserEntity WHERE id = :id")
-    fun getUserById(id: Long): UserEntity
-
+    @Query("SELECT name FROM UserEntity WHERE id = :id")
+    fun getUserById(id: Long): String
+//id: Long
     @Query("DELETE FROM PostEntity WHERE id = :id")
     suspend fun removeById(id: Long)
 

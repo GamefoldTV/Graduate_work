@@ -120,22 +120,54 @@
             tools:text="@sample/posts.json/data/content" />
 
         <TextView
+            android:id="@+id/speakersInfo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/event_speakers"
+            android:lineSpacingMultiplier="1.5"
+            android:paddingBottom="@dimen/common_spacing"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/content" />
+
+        <TextView
             android:id="@+id/speakers"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:autoLink="web"
             android:lineSpacingMultiplier="1.5"
+            android:paddingBottom="@dimen/common_spacing"
+            android:paddingLeft="@dimen/common_spacing"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/speakersInfo"
+            app:layout_constraintTop_toBottomOf="@id/content" />
+
+        <TextView
+            android:id="@+id/participantsInfo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/event_participants"
+            android:lineSpacingMultiplier="1.5"
+            android:paddingBottom="@dimen/common_spacing"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/content"
-            tools:text="@sample/posts.json/data/content" />
+            app:layout_constraintTop_toBottomOf="@id/speakers" />
+
+        <TextView
+            android:id="@+id/participants"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:lineSpacingMultiplier="1.5"
+            android:paddingBottom="@dimen/common_spacing"
+            android:paddingLeft="@dimen/common_spacing"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/participantsInfo"
+            app:layout_constraintTop_toBottomOf="@id/speakers" />
+
 
         <FrameLayout
             android:id="@+id/Attachment_Frame"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_gravity="center"
-            app:layout_constraintTop_toBottomOf="@id/speakers">
+            app:layout_constraintTop_toBottomOf="@id/participants">
 
             <ImageView
                 android:id="@+id/Attachment_Image"

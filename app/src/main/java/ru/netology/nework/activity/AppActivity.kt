@@ -10,11 +10,15 @@ import androidx.navigation.findNavController
 import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nework.R
+import ru.netology.nework.activity.FeedJobsFragment.Companion.userId
 import ru.netology.nework.auth.AppAuth
 import ru.netology.nework.viewmodel.AuthViewModel
 import javax.inject.Inject
 
 val coordinatesMoscow = Point(55.7522200, 37.6155600)
+val dateFormat = "dd.MM.yyyy"
+val timeFormat = "HH:mm"
+
 
 @AndroidEntryPoint
 class AppActivity : AppCompatActivity(R.layout.activity_app) {
@@ -46,6 +50,9 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.wall -> {
+                findNavController(R.id.nav_host_fragment).navigateUp()
+                findNavController(R.id.nav_host_fragment)
+                    .navigate(R.id.action_feedFragment_to_wallFragment)
                 true
             }
             R.id.posts -> {
@@ -58,7 +65,19 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                     .navigate(R.id.action_feedFragment_to_feedEventFragment)
                 true
             }
+            R.id.jobs -> {
+                findNavController(R.id.nav_host_fragment).navigateUp()
+           //     findNavController(R.id.nav_host_fragment).navigate(R.id.action_feedFragment_to_feedJobsFragment)
+                findNavController(R.id.nav_host_fragment).navigate(R.id.action_feedFragment_to_feedJobsFragment,
+                    Bundle().apply {
+                        userId = auth.authStateFlow.value.id
+                    })
+
+
+                true
+            }
             R.id.signout -> {
+                findNavController(R.id.nav_host_fragment).navigateUp()
                 auth.removeAuth()
                 true
             }

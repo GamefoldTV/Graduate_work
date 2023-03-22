@@ -103,4 +103,14 @@ interface ApiService {
     //==========My Wall=============================================================
     @GET("my/wall")
     suspend fun getMyWall(): Response<List<PostResponse>>
+    //==========Jobs=============================================================
+    @GET("my/jobs")
+    suspend fun getMyJobs(): Response<List<Job>>
+    @POST("my/jobs")
+    suspend fun saveJob(@Body jobRequest: JobRequest): Response<JobResponse>
+    @DELETE("my/jobs/{job_id}")
+    suspend fun removeJobById(@Path("job_id") job_id: Long): Response<Unit>
+    @GET("{user_id}/jobs")
+    suspend fun getJobsByUserId(@Path("user_id") user_id: Long): Response<List<JobResponse>>
+
 }

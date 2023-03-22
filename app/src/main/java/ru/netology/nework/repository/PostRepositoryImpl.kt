@@ -8,6 +8,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import ru.netology.nework.api.*
 import ru.netology.nework.auth.AuthState
 import ru.netology.nework.dao.EventDao
+import ru.netology.nework.dao.JobDao
 import ru.netology.nework.dao.PostDao
 import ru.netology.nework.dao.UserDao
 import ru.netology.nework.dto.*
@@ -26,6 +27,7 @@ class PostRepositoryImpl @Inject constructor(
     private val postdao: PostDao,
     private val eventdao: EventDao,
     private val userdao: UserDao,
+    private val jobdao: JobDao,
     private val apiService: ApiService,
 ) : PostRepository {
     override val posts = postdao.getPosts()
@@ -36,6 +38,9 @@ class PostRepositoryImpl @Inject constructor(
         .flowOn(Dispatchers.Default)
     override val users = userdao.getUsers()
         .map(List<UserEntity>::toDto)
+        .flowOn(Dispatchers.Default)
+    override val jobs = jobdao.getJobs() // TODO
+        .map(List<JobEntity>::toDto)
         .flowOn(Dispatchers.Default)
 
 
@@ -60,6 +65,9 @@ class PostRepositoryImpl @Inject constructor(
                     it.link,
                     it.likeOwnerIds,
                     it.mentionIds,
+                    it.mentionIds?.map { id ->
+                        it.users?.get(id.toString())!!.name
+                    },
                     it.mentionedMe,
                     it.likedByMe,
                     it.attachment,
@@ -135,6 +143,9 @@ class PostRepositoryImpl @Inject constructor(
                 bodyResponse.link,
                 bodyResponse.likeOwnerIds,
                 bodyResponse.mentionIds,
+                bodyResponse.mentionIds?.map { id ->
+                    bodyResponse.users?.get(id.toString())!!.name
+                },
                 bodyResponse.mentionedMe,
                 bodyResponse.likedByMe,
                 bodyResponse.attachment,
@@ -209,6 +220,9 @@ class PostRepositoryImpl @Inject constructor(
                         it.link,
                         it.likeOwnerIds,
                         it.mentionIds,
+                        it.mentionIds?.map { id ->
+                            it.users?.get(id.toString())!!.name
+                        },
                         it.mentionedMe,
                         it.likedByMe,
                         it.attachment,
@@ -319,12 +333,8 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getUsersByIds(ids: List<Long>): List<Users> {
-        val userList = ids.map {
-            userdao.getUserById(it)
-        }
-        return userList
-            .map(UserEntity::toDto)
+    override suspend fun getUsersByIds(id: Long): String {
+        return userdao.getUserById(id)
     }
 
     override suspend fun getEvents() {
@@ -335,6 +345,20 @@ class PostRepositoryImpl @Inject constructor(
             }
             val bodyResponse =
                 response.body() ?: throw ApiError(response.code(), response.message())
+            val users = bodyResponse.map {
+                it.users?.map {
+                    Users(
+                        it.key.toLong(),
+                        it.value.name,
+                        it.value.avatar
+                    )
+                }
+            }
+            users.map {
+                if (it != null) {
+                    userdao.insert(it.toEntity())
+                }
+            }
             val event = bodyResponse.map {
                 Event(
                     it.id,
@@ -350,28 +374,20 @@ class PostRepositoryImpl @Inject constructor(
                     it.likeOwnerIds,
                     it.likedByMe,
                     it.speakerIds,
+                    it.speakerIds?.map { id ->
+                        it.users?.get(id.toString())!!.name
+                    },
                     it.participantsIds,
+                    it.participantsIds?.map { id ->
+                        it.users?.get(id.toString())!!.name
+                    },
                     it.participatedByMe,
                     it.attachment,
                     it.link,
                     it.ownedByMe
                 )
             }
-            val users = bodyResponse.map {
-                it.users?.map {
-                    Users(
-                        it.key.toLong(),
-                        it.value.name,
-                        it.value.avatar
-                    )
-                }
-            }
             eventdao.insert(event.toEntity())
-            users.map {
-                if (it != null) {
-                    userdao.insert(it.toEntity())
-                }
-            }
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -413,7 +429,13 @@ class PostRepositoryImpl @Inject constructor(
                 bodyResponse.likeOwnerIds,
                 bodyResponse.likedByMe,
                 bodyResponse.speakerIds,
+                bodyResponse.speakerIds?.map { id ->
+                    bodyResponse.users?.get(id.toString())!!.name
+                },
                 bodyResponse.participantsIds,
+                bodyResponse.participantsIds?.map { id ->
+                    bodyResponse.users?.get(id.toString())!!.name
+                },
                 bodyResponse.participatedByMe,
                 bodyResponse.attachment,
                 bodyResponse.link,
@@ -476,7 +498,13 @@ class PostRepositoryImpl @Inject constructor(
                             it.likeOwnerIds,
                             it.likedByMe,
                             it.speakerIds,
+                            it.speakerIds?.map { id ->
+                                it.users?.get(id.toString())!!.name
+                            },
                             it.participantsIds,
+                            it.participantsIds?.map { id ->
+                                it.users?.get(id.toString())!!.name
+                            },
                             it.participatedByMe,
                             it.attachment,
                             it.link,
@@ -505,7 +533,13 @@ class PostRepositoryImpl @Inject constructor(
                             it.likeOwnerIds,
                             it.likedByMe,
                             it.speakerIds,
+                            it.speakerIds?.map { id ->
+                                it.users?.get(id.toString())!!.name
+                            },
                             it.participantsIds,
+                            it.participantsIds?.map { id ->
+                                it.users?.get(id.toString())!!.name
+                            },
                             it.participatedByMe,
                             it.attachment,
                             it.link,
@@ -524,7 +558,7 @@ class PostRepositoryImpl @Inject constructor(
     override suspend fun removeEventById(id: Long) {
         try {
             eventdao.removeById(id)
-            val response = apiService.removeById(id)
+            val response = apiService.removeEventById(id)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -558,7 +592,13 @@ class PostRepositoryImpl @Inject constructor(
                             it.likeOwnerIds,
                             it.likedByMe,
                             it.speakerIds,
+                            it.speakerIds?.map { id ->
+                                it.users?.get(id.toString())!!.name
+                            },
                             it.participantsIds,
+                            it.participantsIds?.map { id ->
+                                it.users?.get(id.toString())!!.name
+                            },
                             it.participatedByMe,
                             it.attachment,
                             it.link,
@@ -587,7 +627,13 @@ class PostRepositoryImpl @Inject constructor(
                             it.likeOwnerIds,
                             it.likedByMe,
                             it.speakerIds,
+                            it.speakerIds?.map { id ->
+                                it.users?.get(id.toString())!!.name
+                            },
                             it.participantsIds,
+                            it.participantsIds?.map { id ->
+                                it.users?.get(id.toString())!!.name
+                            },
                             it.participatedByMe,
                             it.attachment,
                             it.link,
@@ -619,6 +665,86 @@ class PostRepositoryImpl @Inject constructor(
                 )
             }
             userdao.insert(users.toEntity())
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun getJobs(userId : Long) {
+        try {
+            val response = apiService.getJobsByUserId(userId)
+         //   val response = apiService.getMyJobs()
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            val bodyResponse =
+                response.body() ?: throw ApiError(response.code(), response.message())
+            val job = bodyResponse.map {
+                Job(
+                    userId,
+                    it.id,
+                    it.name,
+                    it.position,
+                    it.start,
+                    it.finish,
+                    it.link,
+                )
+            }
+            jobdao.insert(job.toEntity())
+
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun saveJob(userId : Long, job : Job) {
+        try {
+            val jobRequest = JobRequest(
+                job.id,
+                job.name,
+                job.position,
+                job.start,
+                job.finish,
+                job.link
+            )
+            val response = apiService.saveJob(jobRequest)
+
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+
+            val bodyResponse =
+                response.body() ?: throw ApiError(response.code(), response.message())
+            val job = Job(
+                userId,
+                bodyResponse.id,
+                bodyResponse.name,
+                bodyResponse.position,
+                bodyResponse.start,
+                bodyResponse.finish,
+                bodyResponse.link,
+            )
+            jobdao.insert(JobEntity.fromDto(job))
+
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+
+    }
+
+    override suspend fun removeJobById(id: Long) {
+        try {
+            jobdao.removeById(id)
+            val response = apiService.removeJobById(id)
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {

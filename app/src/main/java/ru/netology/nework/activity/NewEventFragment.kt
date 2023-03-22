@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.view.*
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toFile
 import androidx.fragment.app.Fragment
@@ -25,6 +26,9 @@ import ru.netology.nework.enumeration.EventType
 import ru.netology.nework.util.AndroidUtils
 import ru.netology.nework.view.load
 import ru.netology.nework.viewmodel.PostViewModel
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -49,22 +53,32 @@ class NewEventFragment : Fragment() {
         return when (item.itemId) {
             R.id.save -> {
                 fragmentBinding?.let {
-                    viewModel.changeDateTimeEvent(
-                        it.editTextDate.text.toString(),
-                        it.editTextTime.text.toString()
-                    )
-                    viewModel.changeContentEvent(it.editContent.text.toString())
-                    viewModel.changeLinkEvent(it.editLink.text.toString())
-                    viewModel.changeCoordsEvent(
-                      //  viewModel.coords.value?.lat,
-                      //  viewModel.coords.value?.long
-                        it.textCoordLat.text.toString(),
-                        it.textCoordLong.text.toString()
-                    )
-                    viewModel.changeSpeakersEvent(it.editSpeakers.text.toString())
-                    viewModel.changeTypeEvent(it.radioOnline.isChecked)
-                    viewModel.saveEvent()
-                    AndroidUtils.hideKeyboard(requireView())
+                    if (it.editContent.text.toString().isNotEmpty()) {
+
+                        viewModel.changeDateTimeEvent(
+                            it.editTextDate.text.toString(),
+                            it.editTextTime.text.toString()
+                        )
+                        viewModel.changeContentEvent(it.editContent.text.toString())
+                        viewModel.changeLinkEvent(it.editLink.text.toString())
+                        viewModel.changeCoordsEvent(
+                            it.textCoordLat.text.toString(),
+                            it.textCoordLong.text.toString()
+                        )
+                        viewModel.changeSpeakersEvent(it.editSpeakers.text.toString())
+                        viewModel.changeTypeEvent(it.radioOnline.isChecked)
+                        viewModel.saveEvent()
+                        AndroidUtils.hideKeyboard(requireView())
+                    }
+                    else                     {
+                        Toast.makeText(
+                            context,
+                            getString(R.string.new_event_empty_content),
+                            Toast.LENGTH_LONG
+                        )
+                            .show()
+                        it.editContent.requestFocus()
+                    }
                 }
                 true
             }
@@ -84,7 +98,6 @@ class NewEventFragment : Fragment() {
         )
         fragmentBinding = binding
 
-
         val editEvent = viewModel.getEditEvent()
         binding.editContent.setText(editEvent?.content)
         binding.editLink.setText(editEvent?.link)
@@ -100,24 +113,46 @@ class NewEventFragment : Fragment() {
         }
 
         var cal = Calendar.getInstance()
-        binding.editTextDate.setText(SimpleDateFormat("dd.MM.yyyy").format(System.currentTimeMillis()))
-        binding.editTextTime.setText(SimpleDateFormat("HH:mm").format(System.currentTimeMillis()))
+
+        binding.editTextDate.setText(
+            SimpleDateFormat(dateFormat).format(
+                if (editEvent?.datetime != "")
+                    Date.from(
+                        Instant.from(
+                            DateTimeFormatter.ISO_INSTANT.parse(editEvent!!.datetime)
+                        )
+                    )
+                else
+                    cal.time
+            )
+        )
+
+        binding.editTextTime.setText(
+            SimpleDateFormat(timeFormat).format(
+                if (editEvent?.datetime != "")
+                    Date.from(
+                        Instant.from(
+                            DateTimeFormatter.ISO_INSTANT.parse(editEvent.datetime)
+                        )
+                    )
+                else
+                    cal.time
+            )
+        )
 
         val dateSetListener =
             DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
                 cal.set(Calendar.YEAR, year)
                 cal.set(Calendar.MONTH, monthOfYear)
                 cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                val myFormat = "dd.MM.yyyy" // mention the format you need
-                val sdf = SimpleDateFormat(myFormat, Locale.getDefault())
+                val sdf = SimpleDateFormat(dateFormat, Locale.getDefault())
                 binding.editTextDate.setText(sdf.format(cal.time))
             }
 
         val timeSetListener = TimePickerDialog.OnTimeSetListener { view, hour, minute ->
             cal.set(Calendar.HOUR_OF_DAY, hour)
             cal.set(Calendar.MINUTE, minute)
-            val myFormat = "HH:mm"
-            val sdf = SimpleDateFormat(myFormat, Locale.getDefault())
+            val sdf = SimpleDateFormat(timeFormat, Locale.getDefault())
             binding.editTextTime.setText(sdf.format(cal.time))
         }
 
@@ -142,7 +177,16 @@ class NewEventFragment : Fragment() {
         binding.radioOnline.isChecked = editEvent?.type == EventType.ONLINE
         binding.radioOffline.isChecked = editEvent?.type == EventType.OFFLINE
 
-        binding.editContent.requestFocus()
+        binding.editSpeakers.setText(
+            editEvent?.speakerIds?.joinToString(
+                ", ",
+                "",
+                "",
+                -1,
+                "...",
+                null
+            )
+        )
 
         val pickPhotoLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {

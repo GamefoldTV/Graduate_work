@@ -49,6 +49,20 @@
                 android:inputType="textMultiLine"
                 android:padding="@dimen/common_spacing" />
 
+            <TextView
+                android:id="@+id/text_mentions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/post_mentions" />
+
+            <EditText
+                android:id="@+id/edit_mentions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:inputType="textMultiLine"
+                android:padding="@dimen/common_spacing" />
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -97,9 +111,6 @@
                     android:layout_height="wrap_content"
                     tools:text="@sample/posts.json/data/coords"
                     />
-
-
-
 
             </LinearLayout>
 

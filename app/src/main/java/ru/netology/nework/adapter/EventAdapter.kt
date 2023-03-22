@@ -10,15 +10,11 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
 import ru.netology.nework.R
 import ru.netology.nework.databinding.CardEventBinding
 import ru.netology.nework.dto.Event
 import ru.netology.nework.enumeration.AttachmentType
-import ru.netology.nework.repository.PostRepository
-import ru.netology.nework.repository.PostRepositoryImpl
-import ru.netology.nework.util.convertString2Date2String
+import ru.netology.nework.util.convertString2DateTime2String
 import ru.netology.nework.view.load
 import ru.netology.nework.view.loadCircleCrop
 
@@ -59,13 +55,13 @@ class EventViewHolder(
                 authorJob.text = event.authorJob
                 authorJob.visibility = View.VISIBLE
             }
-            published.text = convertString2Date2String(event.published)
+            published.text = convertString2DateTime2String(event.published)
 
             content.text = event.content
 
             eventType.text = event.type.toString()
 
-            datetime.text = convertString2Date2String(event.datetime)
+            datetime.text = convertString2DateTime2String(event.datetime)
 
             if (event.link != null) content.text = "${content.text} \n${event.link}"
 
@@ -73,16 +69,24 @@ class EventViewHolder(
                 avatar.loadCircleCrop(event.authorAvatar)
             else avatar.setImageResource(R.mipmap.ic_avatar_1_round)
 
-            val speakersIds = event.speakerIds?.map {
-             //   repository.users.map {
-
-            //    }
+            if (event.speakerIds?.isEmpty() == true) {
+                speakers.visibility = View.GONE
+                speakersInfo.visibility = View.GONE
+            } else {
+                speakers.visibility = View.VISIBLE
+                speakersInfo.visibility = View.VISIBLE
+                speakers.text = event.speakerList?.joinToString(", ", "", "", 10, "...", null)
             }
 
-            speakers.text =  event.speakerIds?.map {
-                it.toString()
-            }.toString()
-                //speakersIds.toString()
+            if (event.participantsIds?.isEmpty() == true) {
+                participants.visibility = View.GONE
+                participantsInfo.visibility = View.GONE
+            } else {
+                participants.visibility = View.VISIBLE
+                participantsInfo.visibility = View.VISIBLE
+                participants.text =
+                    event.participantsList?.joinToString(", ", "", "", 10, "...", null)
+            }
 
             buttonLike.isChecked = event.likedByMe
             buttonParticipate.isChecked = event.participatedByMe

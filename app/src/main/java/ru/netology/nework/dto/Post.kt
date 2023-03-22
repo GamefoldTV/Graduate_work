@@ -12,6 +12,7 @@ data class Post(
     val link : String? = null,
     val likeOwnerIds : List<Long>? = emptyList(),
     val mentionIds : List<Long>? = emptyList(),
+    val mentionList : List<String>? = emptyList(),
     val mentionedMe : Boolean = false,
     val likedByMe : Boolean = false,
     val attachment : Attachment? = null,

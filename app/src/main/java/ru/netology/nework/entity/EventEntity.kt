@@ -28,7 +28,11 @@ data class EventEntity(
     @TypeConverters(Converters::class)
     val speakerIds : List<Long>?,
     @TypeConverters(Converters::class)
+    val speakerList : List<String>?,
+    @TypeConverters(Converters::class)
     val participantsIds : List<Long>?,
+    @TypeConverters(Converters::class)
+    val participantsList : List<String>?,
     val participatedByMe : Boolean,
     @Embedded
     var attachment: AttachmentEmbeddable?,
@@ -49,7 +53,9 @@ data class EventEntity(
         likeOwnerIds,
         likedByMe,
         speakerIds,
+        speakerList,
         participantsIds,
+        participantsList,
         participatedByMe,
         attachment?.toDto(),
         link,
@@ -72,7 +78,9 @@ data class EventEntity(
                 dto.likeOwnerIds,
                 dto.likedByMe,
                 dto.speakerIds,
+                dto.speakerList,
                 dto.participantsIds,
+                dto.participantsList,
                 dto.participatedByMe,
                 AttachmentEmbeddable.fromDto(dto.attachment),
                 dto.link,
@@ -83,4 +91,3 @@ data class EventEntity(
 
 fun List<EventEntity>.toDto(): List<Event> = map(EventEntity::toDto)
 fun List<Event>.toEntity(): List<EventEntity> = map(EventEntity::fromDto)
-
