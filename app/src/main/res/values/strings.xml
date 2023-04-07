@@ -65,6 +65,7 @@
     <string name="new_job_position">Position:</string>
     <string name="new_job_link">Link:</string>
     <string name="new_job_changeDate">Change</string>
+    <string name="new_job_add">Add new job</string>
     <string name="new_post_empty_content">You need to fill in the content of the post</string>
     <string name="new_event_empty_content">You need to fill in the content of the event</string>
     <string name="new_job_empty_name">You need to fill in the name of the job</string>

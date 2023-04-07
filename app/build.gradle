@@ -7,7 +7,7 @@ android {
     compileSdkVersion 33
 
     defaultConfig {
-        applicationId "ru.netology.nmedia"
+        applicationId "ru.netology.nework"
         minSdkVersion 22
         targetSdkVersion 33
         versionCode 1
