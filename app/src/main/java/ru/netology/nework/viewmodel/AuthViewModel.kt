@@ -24,9 +24,6 @@ class AuthViewModel @Inject constructor(
     val data: LiveData<AuthState> = auth
         .authStateFlow
         .asLiveData(Dispatchers.Default)
-    val authenticated: Boolean
-        get() = auth.authStateFlow.value.id == 0L
-
 
     private val _photoAvatar = MutableLiveData(noPhotoAvatar)
     val photoAvatar: LiveData<PhotoModel>

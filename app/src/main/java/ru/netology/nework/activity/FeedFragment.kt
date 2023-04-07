@@ -11,13 +11,17 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nework.R
+import ru.netology.nework.activity.ImagePreviewFragment.Companion.textArg
 import ru.netology.nework.activity.MapsPreviewFragment.Companion.doubleArg1
 import ru.netology.nework.activity.MapsPreviewFragment.Companion.doubleArg2
+import ru.netology.nework.activity.WallFragment.Companion.userId
+import ru.netology.nework.activity.WallFragment.Companion.userAvatar
+import ru.netology.nework.activity.WallFragment.Companion.userName
+import ru.netology.nework.activity.WallFragment.Companion.userPosition
 import ru.netology.nework.adapter.OnInteractionListener
 import ru.netology.nework.adapter.PostsAdapter
 import ru.netology.nework.databinding.FragmentFeedBinding
 import ru.netology.nework.dto.Post
-import ru.netology.nework.util.CompanionArg.Companion.textArg
 import ru.netology.nework.viewmodel.PostViewModel
 
 @AndroidEntryPoint
@@ -65,8 +69,24 @@ class FeedFragment : Fragment() {
                     })
 
             }
+
+            override fun onGo2Wall(
+                userId: Long,
+                userName: String,
+                userPosition: String?,
+                userAvatar: String?
+            ) {
+                findNavController().navigate(R.id.action_feedFragment_to_wallFragment,
+                    Bundle().apply {
+                        this.userId = userId
+                        this.userName = userName
+                        this.userPosition = userPosition
+                        this.userAvatar = userAvatar
+                    })
+            }
         })
         binding.list.adapter = adapter
+
         viewModel.dataState.observe(viewLifecycleOwner) { state ->
             binding.progress.isVisible = state.loading
             binding.swiperefresh.isRefreshing = state.refreshing
@@ -80,7 +100,6 @@ class FeedFragment : Fragment() {
             adapter.submitList(state.posts)
             binding.emptyText.isVisible = state.empty
         }
-
 
         binding.swiperefresh.setOnRefreshListener {
             viewModel.refreshPosts()

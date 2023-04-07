@@ -27,9 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/common_spacing"
             android:ellipsize="end"
-            android:singleLine="true"
             app:layout_constraintBottom_toTopOf="@+id/authorJob"
-            app:layout_constraintEnd_toStartOf="@+id/menu"
             app:layout_constraintStart_toEndOf="@id/avatar"
             app:layout_constraintTop_toTopOf="@+id/avatar"
             app:layout_constraintVertical_chainStyle="packed"
@@ -41,33 +39,19 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/common_spacing"
             android:ellipsize="end"
-            android:singleLine="true"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/avatar"
-            app:layout_constraintEnd_toStartOf="@+id/menu"
             app:layout_constraintStart_toEndOf="@id/avatar"
             app:layout_constraintTop_toBottomOf="@+id/author"
             app:layout_constraintVertical_chainStyle="packed"
             tools:text="@sample/posts.json/data/authorJob" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/menu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/common_spacing"
-            android:contentDescription="@string/description_post_menu"
-            app:icon="@drawable/ic_more_vert_24"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            style="@style/Widget.AppTheme.IconButton"
-            />
 
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:barrierDirection="bottom"
-            app:constraint_referenced_ids="avatar, menu, authorJob"
+            app:constraint_referenced_ids="avatar, authorJob"
             tools:layout_editor_absoluteX="16dp"
             tools:layout_editor_absoluteY="80dp" />
 
@@ -78,6 +62,7 @@
             android:layout_height="1dp"
             android:layout_marginStart="@dimen/common_spacing"
             android:layout_marginEnd="@dimen/common_spacing"
+            android:layout_marginBottom="@dimen/common_spacing"
             android:background="@color/divider_color"
             app:layout_constraintBottom_toTopOf="@id/swiperefresh"
             app:layout_constraintEnd_toEndOf="parent"
@@ -120,6 +105,8 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/card_wall_post" />
 
+
+
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -129,10 +116,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
-        android:clickable="true"
-        android:contentDescription="@string/add_post"
         android:focusable="true"
         android:layout_gravity="bottom|end"
-        app:srcCompat="@drawable/ic_add_24dp" />
+        app:srcCompat="@drawable/ic_add_24dp"
+        tools:ignore="ContentDescription" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

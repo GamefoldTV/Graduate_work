@@ -39,7 +39,7 @@ class PostRepositoryImpl @Inject constructor(
     override val users = userdao.getUsers()
         .map(List<UserEntity>::toDto)
         .flowOn(Dispatchers.Default)
-    override val jobs = jobdao.getJobs() // TODO
+    override val jobs = jobdao.getJobs()
         .map(List<JobEntity>::toDto)
         .flowOn(Dispatchers.Default)
 
@@ -47,6 +47,58 @@ class PostRepositoryImpl @Inject constructor(
     override suspend fun getPosts() {
         try {
             val response = apiService.getAll()
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            val bodyResponse =
+                response.body() ?: throw ApiError(response.code(), response.message())
+            val post = bodyResponse.map {
+                Post(
+                    it.id,
+                    it.authorId,
+                    it.author,
+                    it.authorAvatar,
+                    it.authorJob,
+                    it.content,
+                    it.published,
+                    it.coords,
+                    it.link,
+                    it.likeOwnerIds,
+                    it.mentionIds,
+                    it.mentionIds?.map { id ->
+                        it.users?.get(id.toString())!!.name
+                    },
+                    it.mentionedMe,
+                    it.likedByMe,
+                    it.attachment,
+                    it.ownedByMe
+                )
+            }
+            val users = bodyResponse.map {
+                it.users?.map {
+                    Users(
+                        it.key.toLong(),
+                        it.value.name,
+                        it.value.avatar
+                    )
+                }
+            }
+            postdao.insert(post.toEntity())
+            users.map {
+                if (it != null) {
+                    userdao.insert(it.toEntity())
+                }
+            }
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun getPostsByAuthor(userId: Long) {
+        try {
+            val response = apiService.getPostsByAuthor(userId)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -231,18 +283,18 @@ class PostRepositoryImpl @Inject constructor(
                 } ?: throw ApiError(response.code(), response.message())
 
             if (post.likedByMe) {
-                val dislikedPost = post.copy(likedByMe = false)//, likes = post.likes - 1)
+                val dislikedPost = post.copy(likedByMe = false)
                 postdao.insert(PostEntity.fromDto(dislikedPost))
-                val response = apiService.dislikeById(id)
-                if (!response.isSuccessful) {
-                    throw ApiError(response.code(), response.message())
+                val response2 = apiService.dislikeById(id)
+                if (!response2.isSuccessful) {
+                    throw ApiError(response2.code(), response2.message())
                 }
             } else {
-                val likedPost = post.copy(likedByMe = true)//, likes = post.likes + 1)
+                val likedPost = post.copy(likedByMe = true)
                 postdao.insert(PostEntity.fromDto(likedPost))
-                val response = apiService.likeById(id)
-                if (!response.isSuccessful) {
-                    throw ApiError(response.code(), response.message())
+                val response2 = apiService.likeById(id)
+                if (!response2.isSuccessful) {
+                    throw ApiError(response2.code(), response2.message())
                 }
             }
         } catch (e: IOException) {
@@ -252,9 +304,9 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun userAuthentication(login: String, password: String): AuthState {
+    override suspend fun userAuthentication(login: String, pass: String): AuthState {
         try {
-            val authResponse = apiService.userAuthentication(login, password)
+            val authResponse = apiService.userAuthentication(login, pass)
 
             if (!authResponse.isSuccessful) {
                 throw ApiError(authResponse.code(), authResponse.message())
@@ -281,11 +333,11 @@ class PostRepositoryImpl @Inject constructor(
 
     override suspend fun userRegistration(
         login: String,
-        password: String,
+        pass: String,
         name: String
     ): AuthState {
         try {
-            val authResponse = apiService.userRegistration(login, password, name)
+            val authResponse = apiService.userRegistration(login, pass, name)
 
             if (!authResponse.isSuccessful) {
                 throw ApiError(authResponse.code(), authResponse.message())
@@ -305,17 +357,16 @@ class PostRepositoryImpl @Inject constructor(
 
     override suspend fun userRegistrationWithAvatar(
         login: String,
-        password: String,
+        pass: String,
         name: String,
         avatar: MediaRequest
     ): AuthState {
         try {
-            // val media = upload(avatar)
             val media = MultipartBody.Part.createFormData(
                 "file", avatar.file.name, avatar.file.asRequestBody()
             )
 
-            val authResponse = apiService.userRegistrationWithAvatar(login, password, name, media)
+            val authResponse = apiService.userRegistrationWithAvatar(login, pass, name, media)
 
             if (!authResponse.isSuccessful) {
                 throw ApiError(authResponse.code(), authResponse.message())
@@ -331,10 +382,6 @@ class PostRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             throw UnknownError
         }
-    }
-
-    override suspend fun getUsersByIds(id: Long): String {
-        return userdao.getUserById(id)
     }
 
     override suspend fun getEvents() {
@@ -672,10 +719,9 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getJobs(userId : Long) {
+    override suspend fun getJobs(userId: Long, currentUser: Long) {
         try {
             val response = apiService.getJobsByUserId(userId)
-         //   val response = apiService.getMyJobs()
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -684,6 +730,7 @@ class PostRepositoryImpl @Inject constructor(
             val job = bodyResponse.map {
                 Job(
                     userId,
+                    userId == currentUser,
                     it.id,
                     it.name,
                     it.position,
@@ -719,8 +766,9 @@ class PostRepositoryImpl @Inject constructor(
 
             val bodyResponse =
                 response.body() ?: throw ApiError(response.code(), response.message())
-            val job = Job(
+            val job2save = Job(
                 userId,
+                true,
                 bodyResponse.id,
                 bodyResponse.name,
                 bodyResponse.position,
@@ -728,7 +776,7 @@ class PostRepositoryImpl @Inject constructor(
                 bodyResponse.finish,
                 bodyResponse.link,
             )
-            jobdao.insert(JobEntity.fromDto(job))
+            jobdao.insert(JobEntity.fromDto(job2save))
 
         } catch (e: IOException) {
             throw NetworkError

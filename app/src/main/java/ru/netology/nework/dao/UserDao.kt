@@ -4,7 +4,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
-import ru.netology.nework.entity.PostEntity
 import ru.netology.nework.entity.UserEntity
 
 @Dao
@@ -14,7 +13,7 @@ interface UserDao {
 
     @Query("SELECT name FROM UserEntity WHERE id = :id")
     fun getUserById(id: Long): String
-//id: Long
+
     @Query("DELETE FROM PostEntity WHERE id = :id")
     suspend fun removeById(id: Long)
 

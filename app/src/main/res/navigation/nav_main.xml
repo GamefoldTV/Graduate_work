@@ -95,5 +95,15 @@
     <fragment
         android:id="@+id/wallFragment"
         android:name="ru.netology.nework.activity.WallFragment"
-        android:label="WallFragment" />
+        android:label="WallFragment" >
+        <action
+            android:id="@+id/action_wallFragment_to_newPostFragment"
+            app:destination="@id/newPostFragment" />
+        <action
+            android:id="@+id/action_wallFragment_to_mapsPreviewFragment"
+            app:destination="@id/mapsPreviewFragment" />
+        <action
+            android:id="@+id/action_wallFragment_to_feedJobsFragment"
+            app:destination="@id/feedJobsFragment" />
+    </fragment>
 </navigation>

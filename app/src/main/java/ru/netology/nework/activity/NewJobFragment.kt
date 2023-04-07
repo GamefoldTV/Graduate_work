@@ -33,7 +33,7 @@ class NewJobFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_new_post, menu) // связка с созданным меню
+        inflater.inflate(R.menu.menu_new_post, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -107,7 +107,7 @@ class NewJobFragment : Fragment() {
                     SimpleDateFormat(dateFormat).format(
                         Date.from(
                             Instant.from(
-                                DateTimeFormatter.ISO_INSTANT.parse(editJob?.finish)
+                                DateTimeFormatter.ISO_INSTANT.parse(editJob.finish)
                             )
                         )
                     )

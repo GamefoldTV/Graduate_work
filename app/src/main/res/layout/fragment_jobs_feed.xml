@@ -13,7 +13,7 @@
             android:id="@+id/headerJobs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/marginLeft"
+            android:layout_marginStart="@dimen/marginLeft"
             android:layout_marginTop="@dimen/marginTop"
             android:text="@string/header_jobs"
             android:visibility="visible"
@@ -30,6 +30,7 @@
             android:layout_height="1dp"
             android:layout_marginStart="@dimen/common_spacing"
             android:layout_marginEnd="@dimen/common_spacing"
+            android:layout_marginBottom="@dimen/common_spacing"
             android:background="@color/divider_color"
             app:layout_constraintBottom_toTopOf="@id/swiperefresh"
             app:layout_constraintEnd_toEndOf="parent"
@@ -82,8 +83,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:clickable="true"
         android:focusable="true"
-        app:srcCompat="@drawable/ic_add_24dp" />
+        app:srcCompat="@drawable/ic_add_24dp"
+        tools:ignore="ContentDescription" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

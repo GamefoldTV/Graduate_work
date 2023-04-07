@@ -11,66 +11,50 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.netology.nework.R
-import ru.netology.nework.databinding.CardPostBinding
+import ru.netology.nework.databinding.CardWallPostBinding
 import ru.netology.nework.dto.Post
 import ru.netology.nework.enumeration.AttachmentType
-import ru.netology.nework.util.convertString2DateTime2String
 import ru.netology.nework.view.load
-import ru.netology.nework.view.loadCircleCrop
 
-interface OnInteractionListener {
+interface OnInteractionWallListener {
     fun onLike(post: Post) {}
     fun onEdit(post: Post) {}
     fun onRemove(post: Post) {}
     fun onPreviewImage(post: Post) {}
     fun onPreviewMap(post: Post) {}
-    fun onGo2Wall(userId: Long, userName: String, userPosition: String?, userAvatar: String?) {}
 }
 
-class PostsAdapter(
-    private val onInteractionListener: OnInteractionListener,
-) : ListAdapter<Post, PostViewHolder>(PostDiffCallback()) {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
-        val binding = CardPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return PostViewHolder(binding, onInteractionListener)
+class PostWallAdapter(
+    private val OnInteractionWallListener: OnInteractionWallListener,
+) : ListAdapter<Post, PostWallViewHolder>(PostWallDiffCallback()) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostWallViewHolder {
+        val binding =
+            CardWallPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return PostWallViewHolder(binding, OnInteractionWallListener)
     }
 
-    override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: PostWallViewHolder, position: Int) {
         val post = getItem(position)
         holder.bind(post)
     }
 }
 
-class PostViewHolder(
-    private val binding: CardPostBinding,
-    private val onInteractionListener: OnInteractionListener,
+class PostWallViewHolder(
+    private val binding: CardWallPostBinding,
+    private val OnInteractionWallListener: OnInteractionWallListener,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(post: Post) {
         binding.apply {
-            author.text = post.author
-
-            if (post.authorJob.isNullOrBlank()) {
-                authorJob.visibility = View.GONE
-            } else {
-                authorJob.text = post.authorJob
-                authorJob.visibility = View.VISIBLE
-            }
-            published.text = convertString2DateTime2String(post.published)
-
             content.text = post.content
 
             if (post.link != null) content.text = "${content.text} \n${post.link}"
-
-            if (post.authorAvatar != null)
-                avatar.loadCircleCrop(post.authorAvatar)
-            else avatar.setImageResource(R.mipmap.ic_avatar_1_round)
 
             buttonLike.isChecked = post.likedByMe
 
             buttonMap.isVisible = post.coords != null
 
-            if (post.mentionList?.isEmpty() == true) {
+            if (post.mentionIds?.isEmpty() == true) {
                 mentions.visibility = View.GONE
                 mentionsInfo.visibility = View.GONE
             } else {
@@ -134,11 +118,11 @@ class PostViewHolder(
                     setOnMenuItemClickListener { item ->
                         when (item.itemId) {
                             R.id.remove -> {
-                                onInteractionListener.onRemove(post)
+                                OnInteractionWallListener.onRemove(post)
                                 true
                             }
                             R.id.edit_content -> {
-                                onInteractionListener.onEdit(post)
+                                OnInteractionWallListener.onEdit(post)
                                 true
                             }
 
@@ -149,35 +133,16 @@ class PostViewHolder(
             }
 
             buttonLike.setOnClickListener {
-                onInteractionListener.onLike(post)
+                OnInteractionWallListener.onLike(post)
             }
             buttonMap.setOnClickListener {
-                onInteractionListener.onPreviewMap(post)
+                OnInteractionWallListener.onPreviewMap(post)
             }
-
-            avatar.setOnClickListener {
-                onInteractionListener.onGo2Wall(
-                    post.authorId,
-                    post.author,
-                    post.authorJob,
-                    post.authorAvatar
-                )
-            }
-            author.setOnClickListener {
-                onInteractionListener.onGo2Wall(
-                    post.authorId,
-                    post.author,
-                    post.authorJob,
-                    post.authorAvatar
-                )
-            }
-
-
         }
     }
 }
 
-class PostDiffCallback : DiffUtil.ItemCallback<Post>() {
+class PostWallDiffCallback : DiffUtil.ItemCallback<Post>() {
     override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
         return oldItem.id == newItem.id
     }

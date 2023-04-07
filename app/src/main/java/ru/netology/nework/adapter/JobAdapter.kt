@@ -11,7 +11,6 @@ import ru.netology.nework.R
 import ru.netology.nework.databinding.CardJobBinding
 import ru.netology.nework.dto.Job
 import ru.netology.nework.util.convertString2Date2String
-import ru.netology.nework.util.convertString2DateTime2String
 
 interface OnInteractionJobListener {
     fun onEdit(job: Job) {}
@@ -52,10 +51,11 @@ class JobViewHolder(
                 link.visibility = View.VISIBLE
             }
 
-            menu.setOnClickListener {
+            menuJob.visibility = if (job.ownedByMe) View.VISIBLE else View.INVISIBLE
+
+            menuJob.setOnClickListener {
                 PopupMenu(it.context, it).apply {
                     inflate(R.menu.options_post)
-                    //   menu.setGroupVisible(R.id.owned, event.ownedByMe)
                     setOnMenuItemClickListener { item ->
                         when (item.itemId) {
                             R.id.remove -> {

@@ -53,7 +53,7 @@ class AppAuth @Inject constructor(
         _authStateFlow.value = AuthState()
         with(prefs.edit()) {
             clear()
-            commit() //apply()
+            commit()
         }
     }
 }

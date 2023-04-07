@@ -7,14 +7,16 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
-import ru.netology.nework.BuildConfig
-
 import ru.netology.nework.databinding.FragmentImagePreviewBinding
-import ru.netology.nework.util.CompanionArg.Companion.textArg
+import ru.netology.nework.util.StringArg
 import ru.netology.nework.view.load
 
 @AndroidEntryPoint
 class ImagePreviewFragment  : Fragment()  {
+
+    companion object{
+        var Bundle.textArg: String? by StringArg
+    }
 
     private var fragmentBinding: FragmentImagePreviewBinding? = null
 

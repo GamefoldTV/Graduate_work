@@ -10,6 +10,7 @@ interface PostRepository {
     val users: Flow<List<Users>>
     val jobs: Flow<List<Job>>
     suspend fun getPosts()
+    suspend fun getPostsByAuthor(userId: Long)
     suspend fun upload(upload: MediaRequest): MediaResponse
     suspend fun save(post: Post)
     suspend fun saveWithAttachment(post: Post, upload: MediaRequest)
@@ -23,7 +24,6 @@ interface PostRepository {
         name: String,
         avatar: MediaRequest
     ): AuthState
-    suspend fun getUsersByIds(id : Long) : String
     suspend fun getUsers()
     suspend fun getEvents()
     suspend fun saveEvent(event: Event)
@@ -31,8 +31,10 @@ interface PostRepository {
     suspend fun likeEventById(id: Long, likedByMe: Boolean)
     suspend fun removeEventById(id: Long)
     suspend fun partEventById(id: Long, participatedByMe: Boolean)
-    suspend fun getJobs(userId : Long)
-    suspend fun saveJob(userId : Long, job : Job)
+    suspend fun getJobs(userId: Long, currentUser: Long)
+    suspend fun saveJob(userId: Long, job: Job)
     suspend fun removeJobById(id: Long)
+
+
 }
 

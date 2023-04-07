@@ -11,7 +11,6 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nework.R
-import ru.netology.nework.activity.MapsPreviewFragment.Companion.doubleArg1
 import ru.netology.nework.adapter.JobAdapter
 import ru.netology.nework.adapter.OnInteractionJobListener
 import ru.netology.nework.databinding.FragmentJobsFeedBinding
@@ -24,7 +23,7 @@ import ru.netology.nework.viewmodel.PostViewModel
 class FeedJobsFragment : Fragment() {
 
     companion object{
-        var Bundle.userId: Long by LongArg
+        var Bundle.user_Id: Long by LongArg
     }
 
     private val viewModel: PostViewModel by viewModels(
@@ -40,8 +39,15 @@ class FeedJobsFragment : Fragment() {
     ): View {
         val binding = FragmentJobsFeedBinding.inflate(inflater, container, false)
 
-        val userId = (arguments?.userId ?: 0).toLong()
-        viewModel.loadJobs(viewModel.getCurrentUser())
+        val userId = (arguments?.user_Id ?: 0).toLong()
+
+        val currentUser = viewModel.getCurrentUser()
+        viewModel.loadJobs(userId, currentUser)
+
+        if (currentUser == userId)
+            binding.fab.visibility = View.VISIBLE
+        else
+            binding.fab.visibility = View.GONE
 
         val adapter = JobAdapter(object : OnInteractionJobListener {
             override fun onEdit(job: Job) {
@@ -66,16 +72,15 @@ class FeedJobsFragment : Fragment() {
                     .show()
             }
         }
-        viewModel.dataMyJobs.observe(viewLifecycleOwner) { state ->
-            adapter.submitList(state.jobs)
+        viewModel.dataJobs.observe(viewLifecycleOwner) { state ->
+            adapter.submitList(state.jobs.filter {
+                it.userId == userId
+            })
             binding.emptyText.isVisible = state.empty
         }
 
         binding.swiperefresh.setOnRefreshListener {
-        //    if (authViewModel.data.value != null)
-          //      viewModel.refreshJobs(authViewModel.data.value!!.id)
-
-            viewModel.refreshJobs(userId)
+            viewModel.refreshJobs(userId, currentUser)
         }
 
         binding.fab.setOnClickListener {

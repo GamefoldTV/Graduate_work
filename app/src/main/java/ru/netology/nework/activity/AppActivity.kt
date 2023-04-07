@@ -10,12 +10,14 @@ import androidx.navigation.findNavController
 import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nework.R
-import ru.netology.nework.activity.FeedJobsFragment.Companion.userId
+import ru.netology.nework.activity.FeedJobsFragment.Companion.user_Id
+import ru.netology.nework.activity.WallFragment.Companion.userId
 import ru.netology.nework.auth.AppAuth
 import ru.netology.nework.viewmodel.AuthViewModel
 import javax.inject.Inject
 
 val coordinatesMoscow = Point(55.7522200, 37.6155600)
+
 val dateFormat = "dd.MM.yyyy"
 val timeFormat = "HH:mm"
 
@@ -33,7 +35,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
             invalidateOptionsMenu()
             if (it.id == 0L) {
                 findNavController(R.id.nav_host_fragment)
-                    .navigate(R.id.action_feedFragment_to_loginFragment)
+                    .navigate(R.id.loginFragment)
             } else {
                 val welcome = getString(R.string.welcome)
                 Toast.makeText(this@AppActivity,"$welcome ${it.name}", Toast.LENGTH_LONG)
@@ -50,34 +52,29 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.wall -> {
-                findNavController(R.id.nav_host_fragment).navigateUp()
-                findNavController(R.id.nav_host_fragment)
-                    .navigate(R.id.action_feedFragment_to_wallFragment)
-                true
-            }
-            R.id.posts -> {
-                findNavController(R.id.nav_host_fragment).navigateUp()
-                true
-            }
-            R.id.events -> {
-                findNavController(R.id.nav_host_fragment).navigateUp()
-                findNavController(R.id.nav_host_fragment)
-                    .navigate(R.id.action_feedFragment_to_feedEventFragment)
-                true
-            }
-            R.id.jobs -> {
-                findNavController(R.id.nav_host_fragment).navigateUp()
-           //     findNavController(R.id.nav_host_fragment).navigate(R.id.action_feedFragment_to_feedJobsFragment)
-                findNavController(R.id.nav_host_fragment).navigate(R.id.action_feedFragment_to_feedJobsFragment,
+                findNavController(R.id.nav_host_fragment).navigate(R.id.wallFragment,
                     Bundle().apply {
                         userId = auth.authStateFlow.value.id
                     })
-
+                true
+            }
+            R.id.posts -> {
+                findNavController(R.id.nav_host_fragment).navigate(R.id.feedFragment)
+                true
+            }
+            R.id.events -> {
+                findNavController(R.id.nav_host_fragment).navigate(R.id.feedEventFragment)
+                true
+            }
+            R.id.jobs -> {
+                  findNavController(R.id.nav_host_fragment).navigate(R.id.feedJobsFragment,
+                    Bundle().apply {
+                        user_Id = auth.authStateFlow.value.id
+                    })
 
                 true
             }
             R.id.signout -> {
-                findNavController(R.id.nav_host_fragment).navigateUp()
                 auth.removeAuth()
                 true
             }

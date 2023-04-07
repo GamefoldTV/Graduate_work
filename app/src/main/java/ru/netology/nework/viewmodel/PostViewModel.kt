@@ -26,6 +26,7 @@ private val emptyPost = Post(
     content = "",
     published = "",
     likedByMe = false,
+    coords = null
 )
 
 private val emptyEvent = Event(
@@ -38,7 +39,8 @@ private val emptyEvent = Event(
     type = EventType.OFFLINE,
     likedByMe = false,
     participatedByMe = false,
-    ownedByMe = false
+    ownedByMe = false,
+    coords = null
 )
 
 private val emptyJob = Job(
@@ -47,8 +49,8 @@ private val emptyJob = Job(
     name = "",
     position = "",
     start = "",
+    ownedByMe = false
 )
-
 
 private val noPhoto = PhotoModel()
 private val noCoords = Coordinates()
@@ -70,17 +72,6 @@ class PostViewModel @Inject constructor(
                 }
         }.asLiveData(Dispatchers.Default)
 
-    val dataPostsWall: LiveData<FeedModel> = auth.authStateFlow
-        .flatMapLatest { (myId, _) ->
-            repository.posts
-                .map { posts ->
-                    FeedModel(
-                        posts.map { it.copy(ownedByMe = it.authorId == myId) },
-                        posts.isEmpty()
-                    )
-                }
-        }.asLiveData(Dispatchers.Default)
-
     val dataEvents: LiveData<EventFeedModel> = auth.authStateFlow
         .flatMapLatest { (myId, _) ->
             repository.events
@@ -92,14 +83,16 @@ class PostViewModel @Inject constructor(
                 }
         }.asLiveData(Dispatchers.Default)
 
-    val dataMyJobs: LiveData<JobFeedModel> = auth.authStateFlow
+    val dataJobs: LiveData<JobFeedModel> = auth.authStateFlow
         .flatMapLatest { (myId, _) ->
             repository.jobs
                 .map { job ->
                     JobFeedModel(
-                        //    job.map {
-                        //       it.copy(ownedByMe = it.userId == myId) },
-                        job.filter { it.userId == myId },
+                        job.map {
+                            val ownedByMe = if (it.userId == myId) true else false
+                            println("===== " + it.userId + "  " + myId + " " + ownedByMe)
+                            it.copy(ownedByMe = ownedByMe)
+                        },
                         job.isEmpty()
                     )
                 }
@@ -216,21 +209,21 @@ class PostViewModel @Inject constructor(
     }
 
     fun changeMentionList(mentionList: String) {
-        if (mentionList.isNotEmpty())
-            try {
-                val mentionIds = mentionList.split(",").map {
-                    it.trim().toLong()
-                }
+
+        try {
+            val mentionIds = if (mentionList.isNotEmpty())
+                    mentionList.split(",").map {it.trim().toLong()}
+            else emptyList()
                 editedPost.value = editedPost.value?.copy(mentionIds = mentionIds)
             } catch (e: Exception) {
                 _dataState.value = FeedModelState(error = true)
             }
-    }
+        }
 
-    fun changeCoordsPosts(lat: String?, long: String?) {
-        val coords = if (lat == null && long == null || lat == "" && long == "")
-            null
-        else
+        fun changeCoordsPosts(lat: String?, long: String?) {
+            val coords = if (lat == null && long == null || lat == "" && long == "")
+                null
+            else
             Coordinates(lat, long)
 
         if (editedPost.value?.coords == coords) {
@@ -242,10 +235,6 @@ class PostViewModel @Inject constructor(
 
     fun changePhoto(uri: Uri?, file: File?) {
         _photo.value = PhotoModel(uri, file)
-    }
-
-    fun removeAttachmentPosts() {
-        editedPost.value = editedPost.value?.copy(attachment = null)
     }
 
     fun changeCoordsFromMap(lat: String, long: String){
@@ -415,15 +404,15 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    fun loadJobs(userId: Long) = viewModelScope.launch {
-        try {
-            _dataState.value = FeedModelState(loading = true)
-            repository.getJobs(userId)
-            _dataState.value = FeedModelState()
-        } catch (e: Exception) {
-            _dataState.value = FeedModelState(error = true)
+        fun loadJobs(userId: Long, currentUserId: Long) = viewModelScope.launch {
+            try {
+                _dataState.value = FeedModelState(loading = true)
+                repository.getJobs(userId, currentUserId)
+                _dataState.value = FeedModelState()
+            } catch (e: Exception) {
+                _dataState.value = FeedModelState(error = true)
+            }
         }
-    }
 
     fun getCurrentUser(): Long {
         return auth.authStateFlow.value.id
@@ -491,7 +480,6 @@ class PostViewModel @Inject constructor(
         editedJob.value = editedJob.value?.copy(link = text)
     }
 
-
     fun removeJobById(id: Long) = viewModelScope.launch {
         try {
             repository.removeJobById(id)
@@ -500,14 +488,13 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    fun refreshJobs(userId: Long) = viewModelScope.launch {
-        try {
-            _dataState.value = FeedModelState(refreshing = true)
-            repository.getJobs(userId)
-            _dataState.value = FeedModelState()
-        } catch (e: Exception) {
-            _dataState.value = FeedModelState(error = true)
+        fun refreshJobs(userId: Long, currentUserId: Long) = viewModelScope.launch {
+            try {
+                _dataState.value = FeedModelState(refreshing = true)
+                repository.getJobs(userId, currentUserId)
+                _dataState.value = FeedModelState()
+            } catch (e: Exception) {
+                _dataState.value = FeedModelState(error = true)
+            }
         }
-    }
-
 }

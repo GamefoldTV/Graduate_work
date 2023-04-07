@@ -37,7 +37,7 @@ class NewPostFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_new_post, menu) // связка с созданным меню
+        inflater.inflate(R.menu.menu_new_post, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -87,7 +87,7 @@ class NewPostFragment : Fragment() {
         val editPost = viewModel.getEditPost()
         binding.editContent.setText(editPost?.content)
         binding.editLink.setText(editPost?.link)
-        binding.editMentions.setText(editPost?.mentionList?.joinToString(", ",
+        binding.editMentions.setText(editPost?.mentionIds?.joinToString(", ",
             "",
             "",
             -1,
@@ -173,7 +173,6 @@ class NewPostFragment : Fragment() {
         }
 
         viewModel.photo.observe(viewLifecycleOwner) {
-            val url = viewModel.getEditPost()?.attachment?.url
             if (it.uri == null) {
                 binding.AttachmentContainer.visibility = View.GONE
                 return@observe

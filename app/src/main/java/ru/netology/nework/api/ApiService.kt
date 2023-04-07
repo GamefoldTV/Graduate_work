@@ -83,8 +83,6 @@ interface ApiService {
     //==========Events===========================================================
     @GET("events")
     suspend fun getEvents(): Response<List<EventResponse>>
-    @GET("events/{id}")
-    suspend fun getEventById(@Path("id") id: Long): Response<EventResponse>
     @POST("events/{id}/likes")
     suspend fun likeEventById(@Path("id") id: Long): Response<EventResponse>
     @DELETE("events/{id}")
@@ -98,14 +96,9 @@ interface ApiService {
     @POST("events")
     suspend fun saveEvent(@Body eventRequest: EventRequest): Response<EventResponse>
     //==========Wall=============================================================
-    @GET("{author_id}/wall/")
-    suspend fun getWallById(@Path("author_id") author_id: Long): Response<List<PostResponse>>
-    //==========My Wall=============================================================
-    @GET("my/wall")
-    suspend fun getMyWall(): Response<List<PostResponse>>
+    @GET("{author_id}/wall")
+    suspend fun getPostsByAuthor(@Path("user_id") user_id: Long): Response<List<PostResponse>>
     //==========Jobs=============================================================
-    @GET("my/jobs")
-    suspend fun getMyJobs(): Response<List<Job>>
     @POST("my/jobs")
     suspend fun saveJob(@Body jobRequest: JobRequest): Response<JobResponse>
     @DELETE("my/jobs/{job_id}")

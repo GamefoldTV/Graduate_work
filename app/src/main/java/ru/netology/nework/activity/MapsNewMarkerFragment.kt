@@ -49,7 +49,6 @@ class MapsNewMarkerFragment : Fragment(), UserLocationObjectListener, CameraList
     private var routeStartLocation = Point(0.0, 0.0)
     private var followUserLocation = false
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private val viewModel: PostViewModel by viewModels(
         ownerProducer = ::requireParentFragment,
     )
@@ -65,7 +64,6 @@ class MapsNewMarkerFragment : Fragment(), UserLocationObjectListener, CameraList
         inflater.inflate(R.menu.menu_new_marker, menu)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
 
@@ -91,7 +89,6 @@ class MapsNewMarkerFragment : Fragment(), UserLocationObjectListener, CameraList
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

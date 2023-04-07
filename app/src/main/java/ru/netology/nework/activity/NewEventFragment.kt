@@ -27,7 +27,6 @@ import ru.netology.nework.util.AndroidUtils
 import ru.netology.nework.view.load
 import ru.netology.nework.viewmodel.PostViewModel
 import java.time.Instant
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -46,7 +45,7 @@ class NewEventFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_new_post, menu) // связка с созданным меню
+        inflater.inflate(R.menu.menu_new_post, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -112,7 +111,7 @@ class NewEventFragment : Fragment() {
             binding.AttachmentContainer.visibility = View.VISIBLE
         }
 
-        var cal = Calendar.getInstance()
+        val cal = Calendar.getInstance()
 
         binding.editTextDate.setText(
             SimpleDateFormat(dateFormat).format(
@@ -129,7 +128,7 @@ class NewEventFragment : Fragment() {
 
         binding.editTextTime.setText(
             SimpleDateFormat(timeFormat).format(
-                if (editEvent?.datetime != "")
+                if (editEvent.datetime != "")
                     Date.from(
                         Instant.from(
                             DateTimeFormatter.ISO_INSTANT.parse(editEvent.datetime)
@@ -174,11 +173,11 @@ class NewEventFragment : Fragment() {
             ).show()
         }
 
-        binding.radioOnline.isChecked = editEvent?.type == EventType.ONLINE
-        binding.radioOffline.isChecked = editEvent?.type == EventType.OFFLINE
+        binding.radioOnline.isChecked = editEvent.type == EventType.ONLINE
+        binding.radioOffline.isChecked = editEvent.type == EventType.OFFLINE
 
         binding.editSpeakers.setText(
-            editEvent?.speakerIds?.joinToString(
+            editEvent.speakerIds?.joinToString(
                 ", ",
                 "",
                 "",
@@ -256,7 +255,6 @@ class NewEventFragment : Fragment() {
         }
 
         viewModel.photo.observe(viewLifecycleOwner) {
-            val url = viewModel.getEditEvent()?.attachment?.url
             if (it.uri == null) {
                 binding.AttachmentContainer.visibility = View.GONE
                 return@observe

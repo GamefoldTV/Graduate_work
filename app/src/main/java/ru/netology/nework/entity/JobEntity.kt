@@ -9,7 +9,7 @@ data class JobEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long,
     val userId: Long,
- //   val ownedByMe: Boolean = false,
+    val ownedByMe: Boolean = false,
     val name: String,
     val position: String,
     val start : String,
@@ -19,7 +19,7 @@ data class JobEntity(
 ) {
     fun toDto() = Job(
         userId,
- //       ownedByMe,
+        ownedByMe,
         id,
         name,
         position,
@@ -33,7 +33,7 @@ data class JobEntity(
             JobEntity(
                 dto.id,
                 dto.userId,
-            //    dto.ownedByMe,
+                dto.ownedByMe,
                 dto.name,
                 dto.position,
                 dto.start,
